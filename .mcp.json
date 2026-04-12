@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "apex-audit": {
+      "command": "node",
+      "args": ["/Users/tofu/Documents/Claude-Projects/Hedera Hackathon/apex/src/mcp-server.js"],
+      "env": {
+        "HEDERA_ACCOUNT_ID": "${HEDERA_ACCOUNT_ID}",
+        "HEDERA_PRIVATE_KEY": "${HEDERA_PRIVATE_KEY}",
+        "HEDERA_TOPIC_ID": "${HEDERA_TOPIC_ID}",
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}"
+      }
+    }
+  }
+}

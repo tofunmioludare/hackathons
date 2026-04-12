@@ -1,0 +1,22 @@
+# Environment
+.env
+
+# Dependencies
+node_modules/
+venv/
+
+# Build
+dist/
+*.js.map
+
+# Python artifacts (leftover)
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*

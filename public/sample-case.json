@@ -1,0 +1,109 @@
+{
+  "document": {
+    "type": "Legal Case Submission",
+    "version": "1.0",
+    "reference": "HC-2026-NL-0101",
+    "prepared_by": "Hartley & Cross LLP",
+    "prepared_date": "2026-04-12",
+    "classification": "Confidential"
+  },
+
+  "matter": {
+    "title": "Van der Berg v. NexaTech BV — Wrongful Dismissal & AI Bias Claim",
+    "case_type": "Employment Law / AI Discrimination",
+    "jurisdiction": "Netherlands (EU)",
+    "court": "Rechtbank Amsterdam, Sector Kanton",
+    "filing_date": "2026-04-10",
+    "hearing_date": "2026-06-03",
+    "priority": "Urgent",
+    "regulatory_framework": ["EU AI Act (2024/1689)", "Dutch Civil Code Art. 7:681", "GDPR Art. 22 — Automated Decision-Making"]
+  },
+
+  "parties": {
+    "claimant": {
+      "name": "Ingrid van der Berg",
+      "dob": "1984-07-22",
+      "role": "Former Senior Data Analyst",
+      "employer_since": "2019-03-01",
+      "dismissal_date": "2026-01-15",
+      "legal_representative": "Hartley & Cross LLP"
+    },
+    "respondent": {
+      "name": "NexaTech BV",
+      "registration": "NL 63841726",
+      "industry": "FinTech / AI-Powered Credit Services",
+      "registered_address": "Herengracht 420, 1017 BZ Amsterdam"
+    }
+  },
+
+  "facts": {
+    "summary": "The claimant was dismissed following an automated performance review conducted by NexaTech's proprietary AI system 'PerfEval v3.2'. The system rated the claimant in the bottom 8% of the analytics division, triggering an automatic redundancy selection. The claimant disputes the rating on grounds that the training data underlying PerfEval v3.2 contained systematic bias against employees who took parental leave during the 2022–2024 evaluation window.",
+    "key_facts": [
+      "Claimant took 6 months' parental leave (April–September 2023) under Dutch law.",
+      "PerfEval v3.2 calculated performance scores using output metrics from 2022–2025 without adjusting for legally protected absences.",
+      "NexaTech's HR team confirmed the AI recommendation was implemented without independent human review.",
+      "NexaTech has not produced a conformity assessment, technical documentation, or human oversight logs as required under EU AI Act Art. 9, 11, and 14.",
+      "Three other employees dismissed in the same redundancy round also took parental leave during 2022–2024.",
+      "NexaTech deployed PerfEval v3.2 across 340 employees in 4 EU member states, classifying it internally as 'low-risk' — a classification disputed by the claimant.",
+      "The Dutch Data Protection Authority (AP) has been notified under GDPR Art. 22(3) — the claimant was not informed of her right to contest the automated decision."
+    ]
+  },
+
+  "legal_arguments": {
+    "ground_1": {
+      "title": "Wrongful Dismissal — Dutch Civil Code Art. 7:681",
+      "argument": "The dismissal was procedurally and substantively unfair. The redundancy selection was entirely driven by an automated performance score that demonstrably failed to account for legally protected parental leave, rendering the selection criteria invalid under Dutch employment law."
+    },
+    "ground_2": {
+      "title": "EU AI Act Violation — High-Risk System Misclassification",
+      "argument": "PerfEval v3.2 constitutes a high-risk AI system under EU AI Act Annex III, Category 4 (employment, access to self-employment, and workers management and access to employment). NexaTech's self-classification as low-risk is unlawful. The system was deployed without a conformity assessment, without adequate human oversight mechanisms, and without the technical documentation required by Arts. 9–15."
+    },
+    "ground_3": {
+      "title": "GDPR Art. 22 — Automated Decision-Making Without Safeguards",
+      "argument": "The dismissal constitutes a solely automated decision producing significant legal effects. NexaTech failed to (a) inform the claimant of the automated nature of the decision, (b) provide meaningful information about the logic involved, or (c) offer the right to obtain human review. This constitutes a material breach of Art. 22(3) GDPR."
+    },
+    "ground_4": {
+      "title": "Indirect Discrimination — Parental Leave Proxy",
+      "argument": "The output metric bias against employees with parental leave absences constitutes indirect discrimination on the basis of sex and family status, contrary to the Equal Treatment in Employment and Occupation Directive (2000/78/EC) and Dutch implementing legislation."
+    }
+  },
+
+  "evidence": {
+    "documents": [
+      { "id": "EX-01", "description": "PerfEval v3.2 algorithmic output for Ingrid van der Berg (2022–2025)", "status": "Requested via Data Subject Access Request (overdue 47 days)" },
+      { "id": "EX-02", "description": "NexaTech internal communication confirming no human review step for automated dismissals", "status": "Obtained" },
+      { "id": "EX-03", "description": "Employment contract and parental leave records (2019–2026)", "status": "Obtained" },
+      { "id": "EX-04", "description": "Names and leave records of three co-workers dismissed in same round", "status": "Pending (Privacy review)" },
+      { "id": "EX-05", "description": "Expert report: Dr. F. Müller, AI Systems Auditor — bias analysis of PerfEval methodology", "status": "Commissioned" },
+      { "id": "EX-06", "description": "AP notification receipt and case reference (GDPR Art. 22 complaint)", "status": "Obtained" }
+    ]
+  },
+
+  "remedy_sought": {
+    "primary": "Reinstatement to role of Senior Data Analyst with full back-pay from 15 January 2026",
+    "alternative": "Compensation: 18 months' gross salary (€94,500) plus legal costs",
+    "declaratory_relief": "Declaration that PerfEval v3.2 constitutes a high-risk AI system requiring EU AI Act conformity assessment",
+    "injunctive_relief": "Injunction restraining NexaTech from using PerfEval v3.2 for employment decisions pending conformity audit",
+    "regulatory_referral": "Referral to Netherlands Market Surveillance Authority (RVO) for EU AI Act enforcement investigation"
+  },
+
+  "risk_assessment": {
+    "overall_risk": "High",
+    "risk_score": 0.82,
+    "liability_exposure": "€120,000–€180,000 (employment) + regulatory penalties up to €15M (EU AI Act Art. 71)",
+    "key_risks": [
+      "NexaTech DSAR non-compliance may result in adverse inference at hearing",
+      "Three co-workers with similar profiles strengthens systemic discrimination argument",
+      "AP investigation may run in parallel — outcome could influence civil proceedings",
+      "NexaTech has limited legal basis to withhold algorithmic documentation post-EU AI Act"
+    ],
+    "strengths": [
+      "Clear documentary evidence of no human review step",
+      "Regulatory framework strongly supports claimant position",
+      "Expert witness secured with relevant EU AI Act audit credentials",
+      "Timeline of parental leave vs. scoring window is straightforward to establish"
+    ]
+  },
+
+  "notes": "This file has been prepared for submission to APEX AUDIT for AI-assisted legal analysis and immutable audit trail logging on Hedera HCS. All checkpoints — case receipt, AI recommendation, and human attestation — will be permanently recorded. This document is confidential and subject to legal professional privilege."
+}

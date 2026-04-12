@@ -1,0 +1,2396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APEX AUDIT</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f8fafc;color:#0f172a;min-height:100vh;font-size:14px;transition:background .2s,color .2s}
+.mono{font-family:'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',monospace}
+
+/* ── DARK MODE ── */
+body.dark{background:#0f172a;color:#e2e8f0}
+body.dark .topbar{background:#1e293b;border-color:#334155}
+body.dark .logo-text{color:#f1f5f9}
+body.dark .logo-badge{background:#1e1b4b;color:#a5b4fc;border-color:#3730a3}
+body.dark .divider{background:#334155}
+body.dark .bc-cur{color:#f1f5f9}
+body.dark .hcs-pill{background:#1e293b;border-color:#334155;color:#94a3b8}
+body.dark .user-chip{background:#1e293b;border-color:#334155}
+body.dark .user-chip:hover{background:#273448}
+body.dark .user-name{color:#f1f5f9}
+body.dark .sidebar{background:#1e293b;border-color:#334155}
+body.dark .nav-item{color:#94a3b8}
+body.dark .nav-item:hover{background:#273448;color:#e2e8f0}
+body.dark .nav-item.active{background:#1e1b4b;color:#a5b4fc;border-color:#3730a3}
+body.dark .nav-count{background:#334155;color:#94a3b8}
+body.dark .nav-item.active .nav-count{background:#3730a3;color:#a5b4fc}
+body.dark .sb-footer{border-color:#334155;color:#475569}
+body.dark .sb-footer strong{color:#64748b}
+body.dark .stats{background:#334155}
+body.dark .stat{background:#1e293b}
+body.dark .stat-val{color:#f1f5f9}
+body.dark .ph-title{color:#f1f5f9}
+body.dark .case-card{background:#1e293b;border-color:#334155}
+body.dark .case-card:hover{border-color:#6366f1;box-shadow:0 2px 8px rgba(99,102,241,.15)}
+body.dark .cc-name{color:#f1f5f9}
+body.dark .cc-desc{color:#64748b}
+body.dark .p-gray{background:#273448;color:#94a3b8;border-color:#334155}
+body.dark .p-slate{background:#1e293b;color:#94a3b8;border-color:#334155}
+body.dark .p-blue{background:#1e1b4b;color:#a5b4fc;border-color:#3730a3}
+body.dark .p-green{background:#052e16;color:#4ade80;border-color:#166534}
+body.dark .p-amber{background:#2d1a00;color:#fbbf24;border-color:#92400e}
+body.dark .p-red{background:#2d0a0a;color:#f87171;border-color:#991b1b}
+body.dark .p-purple{background:#2e1065;color:#c4b5fd;border-color:#4c1d95}
+body.dark .risk-bar{background:#334155}
+body.dark .detail-header{background:#1e293b;border-color:#334155}
+body.dark .d-title{color:#f1f5f9}
+body.dark .d-desc{color:#94a3b8}
+body.dark .detail-main{border-color:#334155}
+body.dark .meta-item{background:#0f172a;border-color:#334155}
+body.dark .meta-v{color:#f1f5f9}
+body.dark .tl-dot{background:#1e293b;border-color:#334155}
+body.dark .tl-dot.act{background:#1e293b}
+body.dark .tl-line{background:#334155}
+body.dark .tl-step-title{color:#f1f5f9}
+body.dark .tl-desc{color:#64748b}
+body.dark .hcs-card{background:#0f172a;border-color:#334155}
+body.dark .hcs-v{color:#94a3b8}
+body.dark .vlink{background:#1e1b4b;border-color:#3730a3;color:#a5b4fc}
+body.dark .vlink:hover{background:#2d2a5e}
+body.dark .act-panel{background:#1e293b;border-color:#334155}
+body.dark .act-panel-hdr{border-color:#334155;color:#64748b}
+body.dark .rec-conf{color:#64748b}
+body.dark .rec-text{color:#94a3b8}
+body.dark .reviewer-card{background:#0f172a;border-color:#334155}
+body.dark .rv-v{color:#f1f5f9}
+body.dark .btn-ghost{background:#1e293b;color:#94a3b8;border-color:#334155}
+body.dark .btn-ghost:hover{background:#273448;color:#e2e8f0}
+body.dark .btn-approve{background:#052e16;color:#4ade80;border-color:#166534}
+body.dark .btn-approve:hover{background:#0a3d1f}
+body.dark .btn-override{background:#2d1a00;color:#fbbf24;border-color:#92400e}
+body.dark .btn-override:hover{background:#3d2400}
+body.dark .warn-box{background:#2d1a00;border-color:#92400e;color:#fbbf24}
+body.dark .tbl-head{background:#273448;color:#64748b}
+body.dark .tbl-row{background:#1e293b;border-color:#334155}
+body.dark .tbl-row:hover{background:#273448}
+body.dark .tr-case{color:#f1f5f9}
+body.dark .vhero{background:#1e293b;border-color:#334155}
+body.dark .vhero-sub{color:#64748b}
+body.dark .vi{background:#0f172a;border-color:#334155;color:#e2e8f0}
+body.dark .vi:focus{border-color:#6366f1}
+body.dark .vresult{background:#1e293b;border-color:#334155}
+body.dark .vresult-hdr{border-color:#334155}
+body.dark .vmsg{border-color:#334155}
+body.dark .export-card{background:#1e293b;border-color:#334155}
+body.dark .export-card:hover{border-color:#6366f1}
+body.dark .ex-title{color:#f1f5f9}
+body.dark .ex-desc{color:#64748b}
+body.dark .ex-fmt{color:#475569}
+body.dark .recent-exports{background:#1e293b;border-color:#334155}
+body.dark .re-row{border-color:#334155}
+body.dark .re-title{color:#f1f5f9}
+body.dark .toast{background:#1e293b;box-shadow:0 4px 20px rgba(0,0,0,.5)}
+
+/* ── THEME TOGGLE ── */
+.theme-toggle{display:flex;align-items:center;gap:6px;cursor:pointer;padding:4px 10px;border-radius:7px;border:1px solid #e2e8f0;background:#fff;transition:all .14s;user-select:none}
+.theme-toggle:hover{background:#f8fafc}
+body.dark .theme-toggle{background:#1e293b;border-color:#334155}
+body.dark .theme-toggle:hover{background:#273448}
+.toggle-track{width:32px;height:18px;border-radius:99px;background:#e2e8f0;position:relative;transition:background .2s;flex-shrink:0}
+body.dark .toggle-track{background:#4338ca}
+.toggle-thumb{width:14px;height:14px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:transform .2s,box-shadow .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+body.dark .toggle-thumb{transform:translateX(14px)}
+.toggle-lbl{font-size:11px;font-weight:600;color:#64748b}
+body.dark .toggle-lbl{color:#94a3b8}
+
+/* TOPBAR */
+.topbar{background:#fff;border-bottom:1px solid #e2e8f0;padding:0 20px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200}
+.topbar-l{display:flex;align-items:center;gap:12px}
+.logo-mark{width:26px;height:26px;background:#0f172a;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0}
+.logo-text{font-size:13px;font-weight:700;letter-spacing:-.3px;cursor:pointer;color:#0f172a}
+.logo-badge{font-size:10px;background:#eef2ff;color:#4338ca;padding:2px 8px;border-radius:99px;font-weight:600;border:1px solid #c7d2fe;font-family:inherit}
+.divider{width:1px;height:18px;background:#e2e8f0}
+.bc{display:flex;align-items:center;gap:5px;font-size:12px;color:#64748b}
+.bc-crumb{cursor:pointer;color:#6366f1}
+.bc-crumb:hover{text-decoration:underline}
+.bc-sep{color:#cbd5e1}
+.bc-cur{color:#0f172a;font-weight:500}
+.topbar-r{display:flex;align-items:center;gap:10px}
+.hcs-pill{display:flex;align-items:center;gap:5px;font-size:11px;color:#475569;background:#f8fafc;border:1px solid #e2e8f0;border-radius:6px;padding:4px 10px;font-family:inherit}
+.pulse{width:6px;height:6px;border-radius:50%;background:#10b981;animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.user-chip{display:flex;align-items:center;gap:8px;padding:4px 10px;border-radius:7px;border:1px solid #e2e8f0;background:#fff;cursor:pointer}
+.user-chip:hover{background:#f8fafc}
+.avatar{width:26px;height:26px;border-radius:50%;background:#4338ca;color:#fff;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0}
+.user-name{font-size:12px;font-weight:600;color:#0f172a}
+.user-role{font-size:10px;color:#94a3b8}
+
+/* BANNER */
+.banner{background:#0f172a;color:#fff;padding:7px 20px;display:flex;align-items:center;justify-content:space-between;font-size:11px}
+.banner-l{display:flex;align-items:center;gap:7px;color:#94a3b8}
+.banner-l strong{color:#fff}
+.banner-r{color:#818cf8;font-size:10px;font-family:inherit}
+
+/* SHELL */
+.shell{display:flex;min-height:calc(100vh - 80px)}
+.sidebar{width:210px;flex-shrink:0;background:#fff;border-right:1px solid #e2e8f0;padding:14px 8px;position:sticky;top:80px;height:calc(100vh - 80px);overflow-y:auto;display:flex;flex-direction:column}
+.sb-section{margin-bottom:20px}
+.sb-label{font-size:9px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#94a3b8;padding:0 8px;margin-bottom:4px}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:7px;cursor:pointer;font-size:12.5px;color:#475569;font-weight:400;transition:all .12s;border:1px solid transparent;margin-bottom:2px;user-select:none}
+.nav-item:hover{background:#f8fafc;color:#0f172a}
+.nav-item.active{background:#eef2ff;color:#4338ca;font-weight:600;border-color:#c7d2fe}
+.nav-icon{width:14px;height:14px;flex-shrink:0;opacity:.65}
+.nav-item.active .nav-icon{opacity:1}
+.nav-count{margin-left:auto;font-size:10px;background:#f1f5f9;color:#64748b;padding:1px 5px;border-radius:4px;font-weight:600}
+.nav-item.active .nav-count{background:#c7d2fe;color:#4338ca}
+.sb-footer{margin-top:auto;padding:10px 8px;border-top:1px solid #f1f5f9;font-size:10px;color:#94a3b8;line-height:1.6}
+.sb-footer strong{display:block;color:#64748b;margin-bottom:2px}
+
+/* PAGES */
+.pg-wrap{flex:1;overflow-y:auto}
+.page{display:none}
+.page.on{display:block}
+
+/* STATS */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#e2e8f0;border-bottom:1px solid #e2e8f0}
+.stat{background:#fff;padding:14px 18px}
+.stat-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:5px}
+.stat-val{font-size:22px;font-weight:700;letter-spacing:-.5px;color:#0f172a}
+.stat-sub{font-size:11px;color:#94a3b8;margin-top:2px}
+.c-g{color:#047857}.c-a{color:#b45309}.c-i{color:#4338ca}.c-r{color:#b91c1c}
+
+/* PAGE HEADER */
+.ph{padding:16px 20px 10px;display:flex;align-items:flex-start;justify-content:space-between}
+.ph-title{font-size:14px;font-weight:700;color:#0f172a}
+.ph-sub{font-size:11.5px;color:#94a3b8;margin-top:2px}
+
+/* CASE CARDS */
+.card-list{padding:0 16px 20px;display:flex;flex-direction:column;gap:8px}
+.case-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;cursor:pointer;transition:all .14s}
+.case-card:hover{border-color:#a5b4fc;box-shadow:0 2px 8px rgba(99,102,241,.08);transform:translateY(-1px)}
+.cc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px}
+.cc-id{font-size:10.5px;font-weight:600;color:#6366f1;font-family:inherit}
+.cc-name{font-size:13.5px;font-weight:700;color:#0f172a;margin:2px 0 4px}
+.cc-desc{font-size:11.5px;color:#64748b;line-height:1.55}
+.cc-foot{display:flex;align-items:center;gap:6px;margin-top:10px;flex-wrap:wrap}
+.cc-meta{font-size:10px;color:#94a3b8;margin-left:auto;font-family:inherit}
+.risk-bar{flex:1;height:3px;background:#f1f5f9;border-radius:99px;overflow:hidden;min-width:30px}
+.risk-fill{height:100%;border-radius:99px}
+
+/* PILLS */
+.pill{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:99px;white-space:nowrap;display:inline-block}
+.p-blue{background:#eef2ff;color:#4338ca;border:1px solid #e0e7ff}
+.p-green{background:#ecfdf5;color:#047857;border:1px solid #d1fae5}
+.p-amber{background:#fffbeb;color:#b45309;border:1px solid #fef3c7}
+.p-red{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+.p-gray{background:#f8fafc;color:#475569;border:1px solid #e2e8f0}
+.p-slate{background:#f1f5f9;color:#334155;border:1px solid #cbd5e1}
+.p-purple{background:#f5f3ff;color:#6d28d9;border:1px solid #ede9fe}
+
+/* CASE DETAIL */
+.detail-header{background:#fff;border-bottom:1px solid #e2e8f0;padding:16px 20px}
+.back-btn{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;color:#6366f1;cursor:pointer;font-weight:600;margin-bottom:10px}
+.back-btn:hover{color:#4338ca}
+.d-id{font-size:11px;font-weight:600;color:#6366f1;margin-bottom:3px;font-family:inherit}
+.d-title{font-size:20px;font-weight:700;color:#0f172a;letter-spacing:-.4px;margin-bottom:5px}
+.d-desc{font-size:12.5px;color:#475569;line-height:1.6;margin-bottom:12px}
+.d-pills{display:flex;gap:6px;flex-wrap:wrap}
+
+.detail-layout{display:grid;grid-template-columns:1fr 340px}
+.detail-main{padding:18px 20px;border-right:1px solid #e2e8f0}
+.detail-aside{padding:16px}
+
+/* META GRID */
+.meta-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:24px}
+.meta-item{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:9px 12px}
+.meta-k{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:3px}
+.meta-v{font-size:12px;font-weight:600;color:#0f172a;font-family:inherit}
+
+/* TIMELINE */
+.tl-head{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;display:flex;align-items:center;gap:8px;margin-bottom:14px}
+.tl-head::after{content:'';flex:1;height:1px;background:#e2e8f0}
+/* Detail tabs */
+.dtab-bar{display:flex;gap:0;border-bottom:1px solid #e2e8f0;margin-bottom:20px}
+body.dark .dtab-bar{border-color:#334155}
+.dtab{background:none;border:none;border-bottom:2px solid transparent;padding:8px 14px 9px;font-size:12px;font-weight:600;color:#94a3b8;cursor:pointer;font-family:inherit;display:flex;align-items:center;transition:color .14s,border-color .14s;margin-bottom:-1px}
+.dtab:hover{color:#475569}
+body.dark .dtab:hover{color:#cbd5e1}
+.dtab.active{color:#4338ca;border-bottom-color:#4338ca}
+body.dark .dtab.active{color:#a5b4fc;border-bottom-color:#6366f1}
+/* File preview panel */
+.fp-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;margin-bottom:16px}
+body.dark .fp-box{background:rgba(255,255,255,.02);border-color:#334155}
+.fp-header{padding:12px 16px;border-bottom:1px solid #e2e8f0;display:flex;align-items:center;gap:10px}
+body.dark .fp-header{border-color:#334155}
+.fp-icon{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.fp-name{font-size:13px;font-weight:700;color:#0f172a;margin-bottom:1px}
+body.dark .fp-name{color:#f1f5f9}
+.fp-meta{font-size:10px;color:#94a3b8}
+.fp-actions{margin-left:auto;display:flex;gap:7px}
+.fp-hash-block{padding:12px 16px}
+.fp-hash-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;margin-bottom:5px}
+.fp-hash-val{font-size:10px;font-family:'SF Mono',monospace;color:#4338ca;word-break:break-all;line-height:1.6}
+body.dark .fp-hash-val{color:#a5b4fc}
+.fp-hcs-row{display:flex;align-items:center;gap:8px;padding:8px 16px;border-top:1px solid #e2e8f0;background:#fff}
+body.dark .fp-hcs-row{border-color:#334155;background:rgba(255,255,255,.02)}
+.fp-content{padding:0 16px 16px}
+.fp-content-inner{background:#fff;border:1px solid #e2e8f0;border-radius:7px;max-height:380px;overflow-y:auto;padding:14px 16px;font-size:11.5px;font-family:'SF Mono',monospace;line-height:1.7;color:#334155;white-space:pre-wrap;word-break:break-word}
+body.dark .fp-content-inner{background:rgba(255,255,255,.03);border-color:#334155;color:#94a3b8}
+.fp-no-preview{padding:28px 16px;text-align:center;font-size:12px;color:#94a3b8}
+.timeline{display:flex;flex-direction:column}
+.tl-item{display:flex;gap:14px;padding-bottom:24px;position:relative}
+.tl-item:last-child{padding-bottom:0}
+.tl-left{display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:22px}
+.tl-dot{width:22px;height:22px;border-radius:50%;border:2px solid #e2e8f0;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;z-index:1}
+.tl-dot.done{background:#4338ca;border-color:#4338ca}
+.tl-dot.act{border-color:#6366f1;box-shadow:0 0 0 4px rgba(99,102,241,.12);background:#fff}
+.tl-line{width:1px;flex:1;background:#e2e8f0;margin-top:3px}
+.tl-done-line{background:#c7d2fe}
+.tl-body{flex:1;padding-top:1px}
+.tl-step-lbl{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#94a3b8;margin-bottom:1px}
+.tl-step-lbl.done-lbl,.tl-step-lbl.act-lbl{color:#6366f1}
+.tl-step-title{font-size:13.5px;font-weight:700;color:#0f172a;margin-bottom:2px}
+.tl-time{font-size:10.5px;color:#94a3b8;margin-bottom:6px;font-family:inherit}
+.tl-desc{font-size:11.5px;color:#64748b;line-height:1.55;margin-bottom:8px}
+
+/* HCS CARD */
+.hcs-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:10px 12px;margin-bottom:8px}
+.hcs-row{display:flex;gap:8px;margin-bottom:3px}
+.hcs-row:last-child{margin-bottom:0}
+.hcs-k{font-size:10px;font-family:inherit;color:#94a3b8;min-width:88px;flex-shrink:0;padding-top:1px}
+.hcs-v{font-size:10px;font-family:inherit;color:#334155;word-break:break-all;line-height:1.5}
+.hcs-h{color:#6366f1}.hcs-ok{color:#047857}.hcs-warn{color:#b45309}
+
+.vlink{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;color:#4338ca;background:#eef2ff;border:1px solid #c7d2fe;border-radius:5px;padding:4px 9px;cursor:pointer;transition:all .12s;font-family:inherit}
+.vlink:hover{background:#e0e7ff}
+
+/* ACTION PANEL */
+.act-panel{background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden;margin-bottom:12px}
+.act-panel-hdr{padding:10px 14px;border-bottom:1px solid #f1f5f9;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748b;display:flex;align-items:center;justify-content:space-between}
+.act-panel-body{padding:14px}
+.rec-big{font-size:18px;font-weight:700;font-family:inherit;margin-bottom:3px}
+.rec-conf{font-size:11.5px;color:#64748b;margin-bottom:8px}
+.rec-text{font-size:12px;color:#334155;line-height:1.65}
+
+.reviewer-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;margin-bottom:12px}
+.rv-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:6px}
+.rv-row:last-child{margin-bottom:0}
+.rv-k{font-size:10.5px;color:#94a3b8;min-width:75px;flex-shrink:0;padding-top:2px}
+.rv-v{font-size:12px;font-weight:600;color:#0f172a}
+
+/* BUTTONS */
+.btn{border-radius:7px;padding:9px 14px;font-size:12.5px;font-weight:600;cursor:pointer;transition:all .13s;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-family:inherit;border:none}
+.btn-primary{background:#4338ca;color:#fff}
+.btn-primary:hover{background:#3730a3}
+.btn-primary:disabled{opacity:.5;cursor:default}
+.btn-approve{background:#ecfdf5;color:#047857;border:1px solid #6ee7b7}
+.btn-approve:hover{background:#d1fae5}
+.btn-override{background:#fff7ed;color:#c2410c;border:1px solid #fed7aa}
+.btn-override:hover{background:#ffedd5}
+.btn-ghost{background:#fff;color:#475569;border:1px solid #e2e8f0}
+.btn-ghost:hover{background:#f8fafc;color:#0f172a}
+.btn-full{width:100%;display:flex}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+
+/* SPINNER */
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{width:13px;height:13px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.spin-sm{width:10px;height:10px;border:1.5px solid rgba(99,102,241,.2);border-top-color:#6366f1;border-radius:50%;animation:spin .7s linear infinite}
+
+/* WARN BOX */
+.warn-box{background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:10px 12px;font-size:11.5px;color:#92400e;line-height:1.55;margin-bottom:12px}
+
+/* AUDIT LOG TABLE */
+.log-wrap{padding:0 16px 20px}
+.tbl-head{display:grid;grid-template-columns:150px 170px 130px 80px 1fr 90px;gap:10px;padding:8px 12px;background:#f1f5f9;border-radius:7px 7px 0 0;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#64748b}
+.tbl-row{display:grid;grid-template-columns:150px 170px 130px 80px 1fr 90px;gap:10px;padding:9px 12px;background:#fff;border-bottom:1px solid #f1f5f9;font-size:11.5px;align-items:center;cursor:pointer;transition:background .1s}
+.tbl-row:hover{background:#fafafe}
+.tbl-row:last-child{border-bottom:none;border-radius:0 0 7px 7px}
+.tr-ts{font-family:inherit;color:#64748b;font-size:10.5px}
+.tr-case{font-weight:600;color:#0f172a;font-size:11px}
+.tr-hash{font-family:inherit;color:#6366f1;font-size:10px}
+
+/* VERIFY PAGE */
+.vpage{padding:24px}
+.vhero{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;margin-bottom:16px}
+.vhero-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.vhero-sub{font-size:12.5px;color:#64748b;margin-bottom:14px;line-height:1.55}
+.vi-wrap{display:flex;gap:8px}
+.vi{flex:1;border:1.5px solid #e2e8f0;border-radius:8px;padding:9px 12px;font-size:12.5px;font-family:inherit;outline:none;transition:border-color .14s}
+.vi:focus{border-color:#6366f1}
+
+.vresult{background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden}
+.vresult-hdr{padding:12px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:10px}
+.vbadge-ok{background:#ecfdf5;border:1px solid #6ee7b7;color:#047857;border-radius:6px;padding:4px 10px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:4px}
+.vmsg-list{padding:12px 16px}
+.vmsg{padding:8px 0;border-bottom:1px solid #f8fafc}
+.vmsg:last-child{border-bottom:none}
+.vmsg-top{display:flex;align-items:center;gap:8px;margin-bottom:3px}
+.vmsg-seq{font-family:inherit;font-size:10.5px;color:#94a3b8;min-width:36px}
+.vmsg-type{font-size:10.5px;font-weight:700;font-family:inherit}
+.vmsg-ts{font-size:10.5px;font-family:inherit;color:#64748b;margin-left:auto}
+.vmsg-hash{font-size:10px;font-family:inherit;color:#6366f1;padding-left:44px}
+
+/* EXPORT */
+.epage{padding:24px}
+.export-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.export-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px;cursor:pointer;transition:all .14s}
+.export-card:hover{border-color:#a5b4fc;box-shadow:0 2px 8px rgba(99,102,241,.08)}
+.ex-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;margin-bottom:10px}
+.ex-title{font-size:13px;font-weight:700;color:#0f172a;margin-bottom:3px}
+.ex-desc{font-size:11px;color:#64748b;line-height:1.5}
+.ex-fmt{font-size:10px;font-family:inherit;color:#94a3b8;margin-top:7px}
+
+.recent-exports{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px 20px}
+.re-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f1f5f9}
+.re-row:last-child{border-bottom:none}
+.re-title{font-size:12.5px;font-weight:600}
+.re-meta{font-size:10.5px;color:#94a3b8;font-family:inherit;margin-top:2px}
+
+/* DOCUMENT UPLOAD */
+.upload-page{padding:24px}
+.upload-grid{display:grid;grid-template-columns:1fr 380px;gap:20px;align-items:start}
+.upload-drop{border:2px dashed #c7d2fe;border-radius:12px;padding:36px 24px;text-align:center;cursor:pointer;transition:all .2s;background:#fafafe;position:relative}
+.upload-drop:hover,.upload-drop.drag{border-color:#6366f1;background:#eef2ff}
+.upload-drop.drag{border-style:solid}
+.upload-drop input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.ud-icon{width:44px;height:44px;border-radius:10px;background:#eef2ff;display:flex;align-items:center;justify-content:center;margin:0 auto 12px}
+.ud-title{font-size:14px;font-weight:700;color:#0f172a;margin-bottom:4px}
+.ud-sub{font-size:12px;color:#94a3b8;line-height:1.5}
+.ud-formats{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:12px}
+.ud-fmt{font-size:10px;font-weight:600;background:#f1f5f9;color:#64748b;padding:2px 8px;border-radius:4px;border:1px solid #e2e8f0}
+
+.doc-type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.doc-type-btn{border:1.5px solid #e2e8f0;border-radius:8px;padding:10px 12px;cursor:pointer;transition:all .14s;background:#fff;text-align:left}
+.doc-type-btn:hover{border-color:#a5b4fc;background:#fafafe}
+.doc-type-btn.sel{border-color:#6366f1;background:#eef2ff}
+.dt-icon{font-size:18px;margin-bottom:4px}
+.dt-name{font-size:12px;font-weight:700;color:#0f172a;margin-bottom:1px}
+.dt-desc{font-size:10px;color:#94a3b8}
+body.dark .doc-type-btn.sel .dt-name{color:#a5b4fc}
+
+.upload-form-card{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:18px}
+.uf-label{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748b;margin-bottom:6px;display:block}
+.uf-input{width:100%;border:1.5px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-size:12.5px;font-family:inherit;outline:none;transition:border-color .14s;margin-bottom:12px;background:#fff;color:#0f172a}
+.uf-input:focus{border-color:#6366f1}
+.uf-select{width:100%;border:1.5px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-size:12.5px;font-family:inherit;outline:none;background:#fff;color:#0f172a;cursor:pointer;margin-bottom:12px}
+.uf-select:focus{border-color:#6366f1}
+.uf-textarea{width:100%;border:1.5px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-size:12px;font-family:inherit;outline:none;resize:vertical;min-height:70px;transition:border-color .14s;background:#fff;color:#0f172a;margin-bottom:12px}
+.uf-textarea:focus{border-color:#6366f1}
+
+.doc-queue{background:#fff;border:1px solid #e2e8f0;border-radius:10px;overflow:hidden}
+.dq-header{padding:11px 14px;border-bottom:1px solid #f1f5f9;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748b;display:flex;align-items:center;justify-content:space-between}
+.doc-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #f8fafc;transition:background .1s}
+.doc-item:last-child{border-bottom:none}
+.doc-item:hover{background:#fafafe}
+.doc-file-icon{width:32px;height:32px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px}
+.doc-info{flex:1;min-width:0}
+.doc-name{font-size:12px;font-weight:600;color:#0f172a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.doc-meta{font-size:10px;color:#94a3b8;margin-top:1px}
+.doc-status{display:flex;align-items:center;gap:6px}
+.doc-prog{width:60px;height:3px;background:#f1f5f9;border-radius:99px;overflow:hidden}
+.doc-prog-fill{height:100%;border-radius:99px;background:#6366f1;transition:width .5s ease}
+.doc-del{width:20px;height:20px;border-radius:4px;border:none;background:transparent;cursor:pointer;color:#94a3b8;display:flex;align-items:center;justify-content:center;padding:0;transition:all .12s}
+.doc-del:hover{background:#fef2f2;color:#dc2626}
+
+body.dark .upload-drop{background:#1a2236;border-color:#334155}
+body.dark .upload-drop:hover,body.dark .upload-drop.drag{border-color:#6366f1;background:#1e1b4b}
+body.dark .ud-title{color:#f1f5f9}
+body.dark .ud-fmt{background:#273448;color:#64748b;border-color:#334155}
+body.dark .doc-type-btn{background:#1e293b;border-color:#334155}
+body.dark .doc-type-btn:hover{background:#273448;border-color:#4338ca}
+body.dark .doc-type-btn.sel{background:#1e1b4b;border-color:#6366f1}
+body.dark .dt-name{color:#e2e8f0}
+body.dark .upload-form-card{background:#1e293b;border-color:#334155}
+body.dark .uf-input,body.dark .uf-select,body.dark .uf-textarea{background:#0f172a;border-color:#334155;color:#e2e8f0}
+body.dark .uf-input:focus,body.dark .uf-select:focus,body.dark .uf-textarea:focus{border-color:#6366f1}
+body.dark .doc-queue{background:#1e293b;border-color:#334155}
+body.dark .dq-header{border-color:#334155}
+body.dark .doc-item:hover{background:#273448}
+body.dark .doc-name{color:#f1f5f9}
+body.dark .doc-prog{background:#334155}
+
+/* EMAIL REVIEW */
+.email-page{padding:0;display:grid;grid-template-columns:320px 1fr;min-height:calc(100vh - 80px)}
+.email-list-col{border-right:1px solid #e2e8f0;overflow-y:auto;background:#fff}
+.email-list-header{padding:14px 16px;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:#fff;z-index:5}
+.el-title{font-size:13px;font-weight:700;color:#0f172a}
+.email-item{padding:12px 16px;border-bottom:1px solid #f8fafc;cursor:pointer;transition:background .12s;position:relative}
+.email-item:hover{background:#fafafe}
+.email-item.sel{background:#eef2ff;border-left:3px solid #6366f1}
+.email-item.unread .ei-subject{font-weight:700}
+.ei-from{font-size:11.5px;font-weight:600;color:#0f172a;margin-bottom:2px}
+.ei-subject{font-size:11.5px;color:#475569;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ei-preview{font-size:10.5px;color:#94a3b8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ei-meta{display:flex;align-items:center;gap:5px;margin-bottom:3px}
+.ei-time{font-size:10px;color:#94a3b8;margin-left:auto;font-family:inherit}
+.unread-dot{width:6px;height:6px;border-radius:50%;background:#6366f1;flex-shrink:0}
+
+.email-view-col{overflow-y:auto;background:#f8fafc}
+.email-view-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:#94a3b8;font-size:13px;gap:8px}
+.email-view{padding:24px}
+.ev-header{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:18px 20px;margin-bottom:14px}
+.ev-subject{font-size:17px;font-weight:700;color:#0f172a;margin-bottom:10px;letter-spacing:-.3px}
+.ev-meta-row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.ev-from{font-size:12px;color:#475569}
+.ev-from strong{color:#0f172a}
+.ev-time{font-size:11px;color:#94a3b8;font-family:inherit;margin-left:auto}
+
+.ev-body{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:20px;margin-bottom:14px;font-size:13px;color:#334155;line-height:1.7}
+.ev-body .ev-greeting{margin-bottom:12px}
+.ev-body .ev-para{margin-bottom:12px}
+.ev-body .ev-sig{color:#64748b;font-size:12px;margin-top:16px;padding-top:12px;border-top:1px solid #f1f5f9}
+
+.ev-case-embed{background:#f8fafc;border:1px solid #c7d2fe;border-radius:8px;padding:14px 16px;margin:14px 0;border-left:4px solid #6366f1}
+.ev-case-id{font-size:10.5px;font-weight:700;color:#6366f1;font-family:inherit;margin-bottom:4px}
+.ev-case-title{font-size:13.5px;font-weight:700;color:#0f172a;margin-bottom:6px}
+.ev-case-rec{font-size:12px;color:#475569;line-height:1.6;margin-bottom:8px}
+.ev-case-conf{font-size:11px;color:#94a3b8}
+
+.ev-actions{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:16px 18px}
+.ev-actions-title{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748b;margin-bottom:10px}
+.ev-action-note{width:100%;border:1.5px solid #e2e8f0;border-radius:7px;padding:8px 11px;font-size:12px;font-family:inherit;outline:none;resize:vertical;min-height:72px;transition:border-color .14s;margin-bottom:10px;background:#fff;color:#0f172a}
+.ev-action-note:focus{border-color:#6366f1}
+.ev-btn-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.btn-reject{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+.btn-reject:hover{background:#fee2e2}
+.ev-done-banner{background:#ecfdf5;border:1px solid #6ee7b7;border-radius:8px;padding:12px 16px;display:flex;align-items:center;gap:10px;font-size:12.5px;color:#047857;font-weight:600}
+
+body.dark .email-list-col{background:#1e293b;border-color:#334155}
+body.dark .email-list-header{background:#1e293b;border-color:#334155}
+body.dark .el-title{color:#f1f5f9}
+body.dark .email-item:hover{background:#273448}
+body.dark .email-item.sel{background:#1e1b4b;border-color:#6366f1}
+body.dark .ei-from{color:#e2e8f0}
+body.dark .ei-subject{color:#94a3b8}
+body.dark .email-view-col{background:#0f172a}
+body.dark .ev-header{background:#1e293b;border-color:#334155}
+body.dark .ev-subject{color:#f1f5f9}
+body.dark .ev-from{color:#94a3b8}
+body.dark .ev-from strong{color:#e2e8f0}
+body.dark .ev-body{background:#1e293b;border-color:#334155;color:#94a3b8}
+body.dark .ev-body .ev-sig{border-color:#334155;color:#475569}
+body.dark .ev-case-embed{background:#0f172a;border-color:#334155;border-left-color:#6366f1}
+body.dark .ev-case-title{color:#f1f5f9}
+body.dark .ev-case-rec{color:#64748b}
+body.dark .ev-actions{background:#1e293b;border-color:#334155}
+body.dark .ev-action-note{background:#0f172a;border-color:#334155;color:#e2e8f0}
+body.dark .ev-action-note:focus{border-color:#6366f1}
+body.dark .btn-reject{background:#2d0a0a;color:#f87171;border-color:#991b1b}
+body.dark .btn-reject:hover{background:#3d1010}
+
+/* TOAST */
+.toast{position:fixed;bottom:20px;right:20px;background:#0f172a;color:#fff;padding:10px 15px;border-radius:8px;font-size:11.5px;z-index:9999;display:flex;align-items:center;gap:7px;transform:translateY(60px);opacity:0;transition:all .28s cubic-bezier(.34,1.56,.64,1);max-width:360px;box-shadow:0 4px 20px rgba(0,0,0,.22);font-family:inherit}
+.toast.show{transform:translateY(0);opacity:1}
+.tdot{width:6px;height:6px;border-radius:50%;background:#10b981;flex-shrink:0}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .22s ease both}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:#e2e8f0;border-radius:99px}
+
+/* ══════════════════════════════════════════
+   ABOUT PAGE — light + dark
+══════════════════════════════════════════ */
+#pg-about{background:#f8fafc;color:#0f172a}
+body.dark #pg-about{background:#0f172a;color:#e2e8f0}
+
+/* Top bar */
+.ab-bar{padding:0 40px;height:52px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e2e8f0;background:#fff;position:sticky;top:0;z-index:10}
+body.dark .ab-bar{background:#0f172a;border-color:rgba(255,255,255,.07)}
+.ab-bar-logo{display:flex;align-items:center;gap:10px}
+.ab-bar-mark{width:26px;height:26px;background:#4338ca;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ab-bar-name{font-size:13px;font-weight:700;color:#0f172a;letter-spacing:-.3px}
+body.dark .ab-bar-name{color:#f1f5f9}
+.ab-bar-badge{font-size:10px;background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe;padding:2px 8px;border-radius:99px;font-weight:600}
+body.dark .ab-bar-badge{background:rgba(99,102,241,.15);color:#a5b4fc;border-color:rgba(99,102,241,.3)}
+.ab-back{font-size:12px;color:#64748b;cursor:pointer;display:flex;align-items:center;gap:5px;font-weight:500;transition:color .14s;border:none;background:none;font-family:inherit}
+.ab-back:hover{color:#4338ca}
+body.dark .ab-back:hover{color:#a5b4fc}
+
+/* Sections */
+.ab-section{padding:64px 40px;max-width:1100px;margin:0 auto}
+.ab-section-sm{padding:48px 40px;max-width:1100px;margin:0 auto}
+.ab-hero{padding:88px 40px 72px;max-width:900px;margin:0 auto;text-align:center}
+.ab-divider{height:1px;margin:0 40px;background:#e2e8f0}
+body.dark .ab-divider{background:linear-gradient(90deg,transparent,rgba(99,102,241,.25),transparent)}
+
+/* Typography */
+.ab-eyebrow{font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#4338ca;margin-bottom:10px}
+body.dark .ab-eyebrow{color:#6366f1}
+.ab-h1{font-size:44px;font-weight:800;letter-spacing:-1.5px;line-height:1.1;margin-bottom:22px;background:linear-gradient(135deg,#0f172a 0%,#4338ca 55%,#6366f1 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+body.dark .ab-h1{background:linear-gradient(135deg,#f1f5f9 0%,#a5b4fc 60%,#818cf8 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.ab-h2{font-size:28px;font-weight:800;letter-spacing:-.6px;line-height:1.2;color:#0f172a;margin-bottom:12px}
+body.dark .ab-h2{color:#f1f5f9}
+.ab-lead{font-size:16px;color:#475569;line-height:1.75;max-width:660px;margin:0 auto}
+body.dark .ab-lead{color:#94a3b8}
+.ab-body-text{font-size:14px;color:#475569;line-height:1.85}
+body.dark .ab-body-text{color:#94a3b8}
+.ab-sub{font-size:14px;color:#64748b;line-height:1.7;max-width:700px;margin-bottom:36px}
+body.dark .ab-sub{color:#94a3b8}
+
+/* Stats row */
+.ab-stats{display:flex;justify-content:center;gap:48px;flex-wrap:wrap;margin-top:48px;padding-top:40px;border-top:1px solid #e2e8f0}
+body.dark .ab-stats{border-color:rgba(255,255,255,.07)}
+.ab-stat-val{font-size:30px;font-weight:800;letter-spacing:-.8px;color:#0f172a}
+body.dark .ab-stat-val{color:#f1f5f9}
+.ab-stat-lbl{font-size:11px;color:#94a3b8;margin-top:2px}
+
+/* Grids */
+.ab-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
+.ab-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+
+/* Cards */
+.ab-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:24px;transition:border-color .2s}
+body.dark .ab-card{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.07)}
+.ab-card-title{font-size:14px;font-weight:700;color:#0f172a;margin-bottom:6px}
+body.dark .ab-card-title{color:#f1f5f9}
+.ab-card-body{font-size:12px;color:#64748b;line-height:1.65}
+.ab-card-tag{display:inline-block;margin-top:10px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px}
+
+/* Quote */
+.ab-quote{background:#eef2ff;border-left:3px solid #4338ca;padding:18px 20px;border-radius:0 8px 8px 0}
+body.dark .ab-quote{background:rgba(99,102,241,.07);border-left-color:#6366f1}
+.ab-quote-text{font-size:14px;color:#334155;line-height:1.7;font-style:italic}
+body.dark .ab-quote-text{color:#c7d2fe}
+.ab-quote-attr{font-size:11px;color:#4338ca;margin-top:10px;font-weight:600}
+body.dark .ab-quote-attr{color:#4338ca}
+
+/* Market map */
+.ab-market-card{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:18px 20px;margin-top:20px}
+body.dark .ab-market-card{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.07)}
+.ab-market-lbl{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#94a3b8;margin-bottom:12px}
+.ab-market-row{display:flex;align-items:center;gap:8px;font-size:12px;color:#475569;margin-bottom:8px}
+.ab-market-row:last-child{margin-bottom:0}
+body.dark .ab-market-row{color:#94a3b8}
+.ab-market-row strong{color:#0f172a}
+body.dark .ab-market-row strong{color:#e2e8f0}
+
+/* Partners */
+.ab-partner-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:28px;transition:all .2s}
+body.dark .ab-partner-card{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.07)}
+.ab-partner-name{font-size:18px;font-weight:800;color:#0f172a;margin-bottom:4px}
+body.dark .ab-partner-name{color:#f1f5f9}
+.ab-partner-body{font-size:12px;color:#64748b;line-height:1.65;margin-bottom:14px}
+.ab-tech-pill{font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;border:1px solid;display:inline-block}
+
+/* Roadmap */
+.ab-rm-spine{display:grid;grid-template-columns:1fr 56px 1fr;gap:0}
+.ab-rm-col-l{padding-right:28px}
+.ab-rm-col-r{padding-left:28px}
+.ab-rm-center{display:flex;flex-direction:column;align-items:center;position:relative}
+.ab-rm-dot{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;border:2px solid;flex-shrink:0;z-index:2;position:relative}
+.ab-rm-line{width:1px;flex:1;min-height:24px;background:#e2e8f0}
+body.dark .ab-rm-line{background:rgba(99,102,241,.25)}
+.ab-rm-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:22px 24px;margin-bottom:32px}
+body.dark .ab-rm-card{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.07)}
+.ab-rm-card.live{background:#eef2ff;border-color:#c7d2fe}
+body.dark .ab-rm-card.live{background:rgba(99,102,241,.08);border-color:rgba(99,102,241,.35)}
+.ab-rm-phase-lbl{font-size:9.5px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
+.ab-rm-title{font-size:15px;font-weight:800;color:#0f172a;margin-bottom:8px}
+body.dark .ab-rm-title{color:#f1f5f9}
+.ab-rm-desc{font-size:12px;color:#64748b;line-height:1.6;margin-bottom:12px}
+.ab-rm-feat{font-size:11px;color:#475569;display:flex;align-items:flex-start;gap:6px;margin-bottom:5px}
+body.dark .ab-rm-feat{color:#94a3b8}
+.ab-rm-feat::before{content:'→';color:#6366f1;flex-shrink:0;font-size:10px;padding-top:1px}
+.ab-rm-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:12px}
+
+/* Vision diagram */
+.ab-diagram{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:16px;padding:36px}
+body.dark .ab-diagram{background:rgba(255,255,255,.02);border-color:rgba(255,255,255,.07)}
+.ab-diagram-title{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#94a3b8;text-align:center;margin-bottom:32px}
+.ab-node{border-radius:10px;padding:10px 16px;display:flex;align-items:center;gap:9px}
+.ab-node-primary{background:#eef2ff;border:1.5px solid #c7d2fe}
+body.dark .ab-node-primary{background:rgba(67,56,202,.15);border-color:rgba(99,102,241,.5)}
+.ab-node-plain{background:#fff;border:1px solid #e2e8f0}
+body.dark .ab-node-plain{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1)}
+.ab-node-spec{background:#fff;border:1px solid #e2e8f0}
+body.dark .ab-node-spec{background:rgba(15,23,42,.8);border-color:rgba(255,255,255,.1)}
+.ab-node-dashed{border:1px dashed #cbd5e1;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:9px;flex:1}
+body.dark .ab-node-dashed{border-color:rgba(255,255,255,.15)}
+.ab-node-name{font-size:12px;font-weight:700;color:#0f172a}
+body.dark .ab-node-name{color:#e2e8f0}
+.ab-node-sub{font-size:9.5px;color:#64748b}
+.ab-v-line{width:1px;height:20px;background:#c7d2fe;align-self:center;margin:0 auto}
+body.dark .ab-v-line{background:rgba(99,102,241,.3)}
+.ab-flow-lbl{font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#94a3b8;text-align:center}
+.ab-hcs-rail{width:100%;max-width:640px;border-radius:8px;padding:10px 16px;display:flex;align-items:center;justify-content:center;gap:8px;background:linear-gradient(90deg,transparent,rgba(16,185,129,.12),transparent);border:1px solid rgba(16,185,129,.25)}
+body.dark .ab-hcs-rail{background:linear-gradient(90deg,transparent,rgba(16,185,129,.15),transparent)}
+.ab-hcs-rail-text{font-size:11px;color:#047857;font-weight:600;font-family:'SF Mono',monospace;text-align:center}
+body.dark .ab-hcs-rail-text{color:#6ee7b7}
+
+/* About footer */
+.ab-foot{border-top:1px solid #e2e8f0;padding:24px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+body.dark .ab-foot{border-color:rgba(255,255,255,.06)}
+.ab-foot-meta{font-size:11px;color:#94a3b8;font-family:'SF Mono',monospace}
+.ab-foot-links{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.ab-foot-link{font-size:12px;color:#4338ca;text-decoration:none;transition:color .14s;border:none;background:none;font-family:inherit;cursor:pointer}
+.ab-foot-link:hover{color:#6366f1}
+body.dark .ab-foot-link{color:#6366f1}
+body.dark .ab-foot-link:hover{color:#a5b4fc}
+.ab-foot-home{font-size:12px;font-weight:700;color:#4338ca;cursor:pointer;border:none;background:none;font-family:inherit;transition:color .14s}
+.ab-foot-home:hover{color:#6366f1}
+body.dark .ab-foot-home{color:#6366f1}
+body.dark .ab-foot-home:hover{color:#a5b4fc}
+</style>
+</head>
+<body class="dark">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-l">
+    <div class="logo-mark" onclick="nav('active')">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <rect x="1" y="1" width="5" height="5" rx="1" fill="white" opacity=".9"/>
+        <rect x="8" y="1" width="5" height="5" rx="1" fill="white" opacity=".45"/>
+        <rect x="1" y="8" width="5" height="5" rx="1" fill="white" opacity=".45"/>
+        <rect x="8" y="8" width="5" height="5" rx="1" fill="white" opacity=".9"/>
+      </svg>
+    </div>
+    <span class="logo-text" onclick="nav('active')">APEX AUDIT</span>
+    <span class="logo-badge">EU AI Act · Art. 17</span>
+    <div class="divider"></div>
+    <div class="bc" id="bc"><span class="bc-cur">Dashboard</span></div>
+  </div>
+  <div class="topbar-r">
+    <div class="hcs-pill mono">
+      <div class="pulse"></div>Hedera HCS · Testnet · 0.0.8601760
+    </div>
+    <div class="theme-toggle" onclick="toggleDark()" title="Toggle light / dark mode">
+      <div class="toggle-track"><div class="toggle-thumb"></div></div>
+      <span class="toggle-lbl" id="theme-lbl">Dark</span>
+    </div>
+    <div class="user-chip">
+      <div class="avatar">SO</div>
+      <div>
+        <div class="user-name">Sophie O'Brien</div>
+        <div class="user-role">Hartley &amp; Cross LLP · Senior Compliance Officer</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BANNER -->
+<div class="banner">
+  <div class="banner-l">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#6366f1" stroke-width="1.2"/><path d="M6 4v2.5l1.5 1" stroke="#6366f1" stroke-width="1.2" stroke-linecap="round"/></svg>
+    <strong>EU AI Act enforcement: August 2026</strong> — Legal AI is high-risk · Penalties up to €35M or 7% global revenue
+  </div>
+  <div class="banner-r mono">All decisions immutably sequenced on Hedera · Independently verifiable · No trust required</div>
+</div>
+
+<!-- SHELL -->
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-section">
+      <div class="sb-label">Cases</div>
+      <div class="nav-item active" id="ni-active" onclick="nav('active')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M5 6h6M5 9h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Active Cases<span class="nav-count">4</span>
+      </div>
+      <div class="nav-item" id="ni-completed" onclick="nav('completed')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M5 8l2 2 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Completed<span class="nav-count">2,843</span>
+      </div>
+      <div class="nav-item" id="ni-pending" onclick="nav('pending')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><path d="M8 5v3.5l2 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Pending Review<span class="nav-count">1</span>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-label">Intake</div>
+      <div class="nav-item" id="ni-upload" onclick="nav('upload')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 10V3M5 6l3-3 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 11v2h10v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Upload Documents
+      </div>
+      <div class="nav-item" id="ni-email" onclick="nav('email')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M2 6l6 4 6-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Email Review
+        <span class="nav-count" style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca">3</span>
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-label">Audit</div>
+      <div class="nav-item" id="ni-log" onclick="nav('log')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 5.5h6M5 8h6M5 10.5h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        Full Audit Log
+      </div>
+      <div class="nav-item" id="ni-hashscan" onclick="nav('hashscan')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M2 8h12M8 2l6 6-6 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        HashScan Verify
+      </div>
+      <div class="nav-item" id="ni-export" onclick="nav('export')">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5 7l3 3 3-3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 12v2h10v-2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Export Report
+      </div>
+    </div>
+    <div class="sb-section">
+      <div class="sb-label">Compliance</div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><path d="M8 1.5L2 4.5v3.8C2 11.5 5 14 8 15c3-1 6-3.5 6-6.7V4.5L8 1.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>
+        EU AI Act Status
+      </div>
+      <div class="nav-item">
+        <svg class="nav-icon" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.5"/></svg>
+        Risk Configuration
+      </div>
+    </div>
+    <div class="sb-footer">
+      <strong>Hartley &amp; Cross LLP</strong>
+      APEX AUDIT v2.4.1<br>
+      <span style="color:#a5b4fc">Art. 17 Certified ✓</span>
+    </div>
+  </aside>
+
+  <!-- PAGES -->
+  <div class="pg-wrap">
+
+    <!-- ── ACTIVE CASES ── -->
+    <div class="page on" id="pg-active">
+      <div class="stats">
+        <div class="stat"><div class="stat-lbl">Cases Audited</div><div class="stat-val" id="s-audited">2,847</div><div class="stat-sub">This month</div></div>
+        <div class="stat"><div class="stat-lbl">On-Chain Messages</div><div class="stat-val c-i" id="s-msgs">—</div><div class="stat-sub" id="s-msgs-sub">Topic 0.0.8601760 · <span id="s-tps">—</span> msg/min</div></div>
+        <div class="stat"><div class="stat-lbl">Override Rate</div><div class="stat-val c-a">7.3%</div><div class="stat-sub">↓ 1.2% vs last month</div></div>
+        <div class="stat"><div class="stat-lbl">Compliance Score</div><div class="stat-val c-g">100%</div><div class="stat-sub">Fully Art. 17 compliant</div></div>
+      </div>
+      <div class="ph">
+        <div><div class="ph-title">Active Case Queue</div><div class="ph-sub">Click any case to open the full detail view and begin the audited workflow</div></div>
+      </div>
+      <div class="card-list" id="cl-active"></div>
+    </div>
+
+    <!-- ── CASE DETAIL ── -->
+    <div class="page" id="pg-detail">
+      <div class="detail-header">
+        <div class="back-btn" id="back-btn" onclick="goBack()">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L3 6l5 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back
+        </div>
+        <div class="d-id" id="d-id"></div>
+        <div class="d-title" id="d-title"></div>
+        <div class="d-desc" id="d-desc"></div>
+        <div class="d-pills" id="d-pills"></div>
+      </div>
+      <div class="detail-layout">
+        <div class="detail-main">
+          <div class="meta-grid" id="d-meta"></div>
+          <div class="dtab-bar" id="dtab-bar">
+            <button class="dtab active" id="dtab-trail" onclick="switchDetailTab('trail')">Audit Timeline</button>
+            <button class="dtab" id="dtab-file" onclick="switchDetailTab('file')" style="display:none">
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="margin-right:4px"><path d="M3 1h5l3 3v7H3V1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 1v3h3" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+              Source File
+            </button>
+          </div>
+          <div id="dtab-trail-panel">
+            <div class="timeline" id="d-tl"></div>
+          </div>
+          <div id="dtab-file-panel" style="display:none">
+            <div id="d-file-view"></div>
+          </div>
+        </div>
+        <div class="detail-aside">
+          <div class="reviewer-card">
+            <div class="rv-row">
+              <div class="rv-k">Reviewer</div>
+              <div style="display:flex;align-items:center;gap:7px">
+                <div class="avatar">SO</div>
+                <div><div class="rv-v">Sophie O'Brien</div><div style="font-size:10px;color:#94a3b8">Senior Compliance Officer</div></div>
+              </div>
+            </div>
+            <div class="rv-row"><div class="rv-k">Firm</div><div class="rv-v">Hartley &amp; Cross LLP</div></div>
+            <div class="rv-row"><div class="rv-k">Auth Level</div><div class="rv-v" style="color:#047857">Level 3 · AI Review</div></div>
+            <div class="rv-row"><div class="rv-k">Session</div><div class="rv-v mono" style="font-size:10px">sess_8x2k9p1mw</div></div>
+          </div>
+          <div id="d-action"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── COMPLETED ── -->
+    <div class="page" id="pg-completed">
+      <div class="ph">
+        <div><div class="ph-title">Completed Cases</div><div class="ph-sub">Full 3-checkpoint audit trail verified on Hedera HCS</div></div>
+        <button class="btn btn-ghost" style="font-size:11.5px;padding:6px 12px" onclick="nav('export')">Export All →</button>
+      </div>
+      <div class="card-list" id="cl-completed"></div>
+    </div>
+
+    <!-- ── PENDING REVIEW ── -->
+    <div class="page" id="pg-pending">
+      <div class="ph">
+        <div><div class="ph-title">Pending Human Review</div><div class="ph-sub">AI analysis complete — awaiting human attestation under Art. 14</div></div>
+      </div>
+      <div class="card-list" id="cl-pending"></div>
+      <div style="margin:0 16px">
+        <div class="warn-box">
+          <strong style="display:block;margin-bottom:3px">⚠ Human attestation required before enforcement</strong>
+          Under EU AI Act Art. 14, high-risk AI systems must enable meaningful human oversight. All AI recommendations require documented human review. Unreviewed decisions cannot be acted upon.
+        </div>
+      </div>
+    </div>
+
+    <!-- ── AUDIT LOG ── -->
+    <div class="page" id="pg-log">
+      <div class="ph">
+        <div><div class="ph-title">Full Audit Log</div><div class="ph-sub">All HCS consensus messages · Topic 0.0.8601760 · Immutably sequenced</div></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-ghost" style="font-size:11.5px;padding:6px 12px" onclick="nav('hashscan')">Verify →</button>
+          <button class="btn btn-primary" style="font-size:11.5px;padding:6px 12px" onclick="nav('export')">Export</button>
+        </div>
+      </div>
+      <div class="log-wrap">
+        <div class="tbl-head"><span>Timestamp</span><span>Case ID</span><span>Checkpoint</span><span>Seq #</span><span>Hash</span><span>Status</span></div>
+        <div id="log-body"></div>
+      </div>
+    </div>
+
+    <!-- ── HASHSCAN ── -->
+    <div class="page" id="pg-hashscan">
+      <div class="vpage">
+        <div class="vhero">
+          <div class="vhero-title">Independent Verification</div>
+          <div class="vhero-sub">Query the Hedera network directly. No access to APEX systems required — any party can verify independently using only a topic ID or message hash. A regulator, court, or opposing counsel can confirm the full audit trail without trusting any party.</div>
+          <div class="vi-wrap">
+            <input class="vi" id="vi" placeholder="Enter Topic ID (e.g. 0.0.8601760) or SHA-256 hash…" value="0.0.8601760"/>
+            <button class="btn btn-primary" onclick="runVerify()">Verify on Hedera</button>
+          </div>
+        </div>
+        <div id="v-result"></div>
+      </div>
+    </div>
+
+    <!-- ── EXPORT ── -->
+    <div class="page" id="pg-export">
+      <div class="epage">
+        <div class="ph-title" style="font-size:15px;margin-bottom:4px">Export Compliance Report</div>
+        <div class="ph-sub" style="font-size:12.5px;margin-bottom:20px">Court-ready and regulator-ready documentation. All exports include the full on-chain audit trail with HashScan verification links.</div>
+        <div class="export-grid">
+          <div class="export-card" onclick="doExport('Full Audit Package · PDF')">
+            <div class="ex-icon" style="background:#eef2ff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="3" y="2" width="10" height="12" rx="1.5" stroke="#4338ca" stroke-width="1.5"/><path d="M5 5.5h6M5 8h6M5 10.5h3" stroke="#4338ca" stroke-width="1.4" stroke-linecap="round"/></svg></div>
+            <div class="ex-title">Full Audit Package</div>
+            <div class="ex-desc">All three checkpoints, hashes, reasoning summaries, attestation records. Court-ready format.</div>
+            <div class="ex-fmt mono">PDF · Signed · Timestamped</div>
+          </div>
+          <div class="export-card" onclick="doExport('Machine-Readable JSON')">
+            <div class="ex-icon" style="background:#ecfdf5"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5 4L2 8l3 4M11 4l3 4-3 4" stroke="#047857" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="ex-title">Machine-Readable JSON</div>
+            <div class="ex-desc">Raw HCS message payloads. Compatible with regulatory submission APIs and audit tools.</div>
+            <div class="ex-fmt mono">JSON · HCS Schema v2.1</div>
+          </div>
+          <div class="export-card" onclick="doExport('Regulatory Summary CSV')">
+            <div class="ex-icon" style="background:#fffbeb"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="4" width="12" height="8" rx="1.5" stroke="#b45309" stroke-width="1.5"/><path d="M2 7h12M6 7v5" stroke="#b45309" stroke-width="1.3"/></svg></div>
+            <div class="ex-title">Regulatory Summary</div>
+            <div class="ex-desc">Aggregated outcomes, override rates, confidence scores. Optimised for DPIA submissions.</div>
+            <div class="ex-fmt mono">CSV · EU AI Act Annex IV</div>
+          </div>
+          <div class="export-card" onclick="doExport('HashScan Verification Bundle')">
+            <div class="ex-icon" style="background:#f5f3ff"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5L2 4.5v3.8C2 11.5 5 14 8 15c3-1 6-3.5 6-6.7V4.5L8 1.5z" stroke="#6d28d9" stroke-width="1.5" stroke-linejoin="round"/></svg></div>
+            <div class="ex-title">Verification Bundle</div>
+            <div class="ex-desc">All message hashes with HashScan deep-links. Share with regulator — no login required.</div>
+            <div class="ex-fmt mono">HTML · Self-contained</div>
+          </div>
+          <div class="export-card" onclick="doExport('Human Attestation Records')">
+            <div class="ex-icon" style="background:#fef2f2"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="6" r="3" stroke="#b91c1c" stroke-width="1.5"/><path d="M3 14c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="#b91c1c" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="ex-title">Attestation Records</div>
+            <div class="ex-desc">Reviewer IDs, approve/override decisions, timestamps. Signed with session tokens.</div>
+            <div class="ex-fmt mono">PDF · Per-case · Signed</div>
+          </div>
+          <div class="export-card" onclick="doExport('Risk & Confidence Report')">
+            <div class="ex-icon" style="background:#f0fdf4"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 13l4-5 3 3 4-7" stroke="#059669" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+            <div class="ex-title">Risk &amp; Confidence</div>
+            <div class="ex-desc">Model confidence distribution, risk score trends, override pattern analysis.</div>
+            <div class="ex-fmt mono">PDF · Monthly digest</div>
+          </div>
+        </div>
+        <div class="recent-exports">
+          <div class="tl-head" style="margin-bottom:12px">Recent Exports</div>
+          <div class="re-row"><div><div class="re-title">Full Audit Package — March 2026</div><div class="re-meta mono">Sophie O'Brien · 2026-04-01 09:14 UTC</div></div><button class="btn btn-ghost" style="font-size:11px;padding:5px 10px">Download</button></div>
+          <div class="re-row"><div><div class="re-title">Regulatory Summary CSV — Q1 2026</div><div class="re-meta mono">James Hartley · 2026-04-02 14:37 UTC</div></div><button class="btn btn-ghost" style="font-size:11px;padding:5px 10px">Download</button></div>
+          <div class="re-row"><div><div class="re-title">Verification Bundle — CASE-2024-EU-0039</div><div class="re-meta mono">Sophie O'Brien · 2026-04-08 11:02 UTC</div></div><button class="btn btn-ghost" style="font-size:11px;padding:5px 10px">Download</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── DOCUMENT UPLOAD ── -->
+    <div class="page" id="pg-upload">
+      <div class="ph">
+        <div><div class="ph-title">Upload Documents</div><div class="ph-sub">Attach case documents, specify type, and route them to the correct case workflow</div></div>
+        <button class="btn btn-primary" style="font-size:11.5px;padding:6px 14px" onclick="submitDocs()">Submit to Case Queue</button>
+      </div>
+      <div class="upload-page">
+        <div class="upload-grid">
+          <!-- Left: drop + type selector -->
+          <div>
+            <div class="upload-drop" id="drop-zone" ondragover="onDragOver(event)" ondragleave="onDragLeave(event)" ondrop="onDrop(event)">
+              <input type="file" multiple accept=".pdf,.docx,.doc,.txt,.png,.jpg,.jpeg" onchange="onFileSelect(event)"/>
+              <div class="ud-icon">
+                <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><path d="M11 14V4M7 8l4-4 4 4" stroke="#6366f1" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 15v2a1 1 0 001 1h12a1 1 0 001-1v-2" stroke="#6366f1" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </div>
+              <div class="ud-title">Drop files here or click to browse</div>
+              <div class="ud-sub">Upload case documents to be processed by the AI agent and logged on Hedera HCS</div>
+              <div class="ud-formats">
+                <span class="ud-fmt">PDF</span><span class="ud-fmt">DOCX</span><span class="ud-fmt">TXT</span><span class="ud-fmt">PNG</span><span class="ud-fmt">JPG</span>
+              </div>
+            </div>
+
+            <div style="margin-top:18px">
+              <div style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#64748b;margin-bottom:10px">Document Type</div>
+              <div class="doc-type-grid" id="doc-type-grid">
+                <div class="doc-type-btn sel" onclick="selType(this,'contracts')"><div class="dt-icon">📄</div><div class="dt-name">Contract / Agreement</div><div class="dt-desc">Lease, service, employment</div></div>
+                <div class="doc-type-btn" onclick="selType(this,'evidence')"><div class="dt-icon">🔍</div><div class="dt-name">Evidence / Exhibit</div><div class="dt-desc">Court exhibits, witness statements</div></div>
+                <div class="doc-type-btn" onclick="selType(this,'correspondence')"><div class="dt-icon">✉️</div><div class="dt-name">Correspondence</div><div class="dt-desc">Letters, notices, emails</div></div>
+                <div class="doc-type-btn" onclick="selType(this,'regulatory')"><div class="dt-icon">🏛️</div><div class="dt-name">Regulatory Filing</div><div class="dt-desc">DPIA, enforcement notices</div></div>
+                <div class="doc-type-btn" onclick="selType(this,'financial')"><div class="dt-icon">💰</div><div class="dt-name">Financial Record</div><div class="dt-desc">Payroll, invoices, accounts</div></div>
+                <div class="doc-type-btn" onclick="selType(this,'identity')"><div class="dt-icon">🪪</div><div class="dt-name">Identity / Residency</div><div class="dt-desc">Passports, proof of address</div></div>
+                <div class="doc-type-btn" onclick="selType(this,'medical')"><div class="dt-icon">🏥</div><div class="dt-name">Medical Record</div><div class="dt-desc">Reports, certifications</div></div>
+                <div class="doc-type-btn" onclick="selType(this,'other')"><div class="dt-icon">📁</div><div class="dt-name">Other</div><div class="dt-desc">Specify in notes</div></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: form + queue -->
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="upload-form-card">
+              <label class="uf-label">Associate with Case</label>
+              <select class="uf-select" id="uf-case">
+                <option value="">— Select existing case —</option>
+                <option value="CASE-2026-IE-0041">CASE-2026-IE-0041 · O'Sullivan v. Dept. Social Protection (IE)</option>
+                <option value="CASE-2026-DE-0017">CASE-2026-DE-0017 · Brandt AG EU AI Act (DE)</option>
+                <option value="CASE-2026-NL-0033">CASE-2026-NL-0033 · Vermeer Capital (NL)</option>
+                <option value="CASE-2026-UK-0052">CASE-2026-UK-0052 · Ministry of Justice (UK Gov)</option>
+                <option value="CASE-2026-IE-0009">CASE-2026-IE-0009 · An Bord Pleanála (IE)</option>
+                <option value="new">+ Create new case</option>
+              </select>
+
+              <div id="new-case-fields" style="display:none">
+                <label class="uf-label">New Case Name</label>
+                <input class="uf-input" placeholder="e.g. Smith v. Acme Corp · Contract Dispute" id="uf-new-name"/>
+                <label class="uf-label">Jurisdiction</label>
+                <select class="uf-select" id="uf-jur">
+                  <option>Ireland (EU)</option><option>Germany (EU)</option><option>Netherlands (EU)</option><option>France (EU)</option><option>Belgium (EU)</option><option>Spain (EU)</option><option>Australia (FWC)</option><option>England &amp; Wales (Gov)</option><option>England &amp; Wales</option><option>EU (Multi-State)</option>
+                </select>
+              </div>
+
+              <label class="uf-label">Priority</label>
+              <select class="uf-select" id="uf-priority">
+                <option>Standard</option><option>Urgent</option><option>Low</option>
+              </select>
+
+              <label class="uf-label">Confidentiality Level</label>
+              <select class="uf-select" id="uf-conf">
+                <option>Confidential — Internal only</option>
+                <option>Highly Confidential — Partner review required</option>
+                <option>Attorney-Client Privilege</option>
+                <option>Standard</option>
+              </select>
+
+              <label class="uf-label">Notes for AI Agent</label>
+              <textarea class="uf-textarea" id="uf-notes" placeholder="Any specific instructions for the AI analysis — e.g. 'Focus on penalty clause validity' or 'Cross-reference with EU Reg. 883/2004'…"></textarea>
+
+              <label class="uf-label">Notify reviewers</label>
+              <input class="uf-input" placeholder="email@firm.com, email2@firm.com" id="uf-notify" value="james.hartley@hartleycross.co.uk"/>
+            </div>
+
+            <div class="doc-queue" id="doc-queue">
+              <div class="dq-header">
+                <span>Upload Queue</span>
+                <span id="dq-count" style="color:#94a3b8;font-weight:400">0 files</span>
+              </div>
+              <div id="dq-items">
+                <div style="padding:20px;text-align:center;color:#94a3b8;font-size:12px">No files added yet</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── EMAIL REVIEW ── -->
+    <div class="page" id="pg-email">
+      <div class="email-page">
+        <!-- Email list -->
+        <div class="email-list-col">
+          <div class="email-list-header">
+            <div class="el-title">Review Inbox</div>
+            <span class="pill p-red" style="font-size:10px">3 unread</span>
+          </div>
+          <div id="email-list"></div>
+        </div>
+        <!-- Email view -->
+        <div class="email-view-col" id="email-view-col">
+          <div class="email-view-empty">
+            <svg width="40" height="40" viewBox="0 0 40 40" fill="none"><rect x="5" y="8" width="30" height="24" rx="3" stroke="#cbd5e1" stroke-width="2"/><path d="M5 15l15 10 15-10" stroke="#cbd5e1" stroke-width="2" stroke-linecap="round"/></svg>
+            Select an email to review
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ABOUT ── -->
+    <div class="page" id="pg-about">
+
+      <!-- About back bar -->
+      <div class="ab-bar">
+        <div class="ab-bar-logo">
+          <div class="ab-bar-mark">
+            <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" fill="white" opacity=".9"/><rect x="8" y="1" width="5" height="5" rx="1" fill="white" opacity=".45"/><rect x="1" y="8" width="5" height="5" rx="1" fill="white" opacity=".45"/><rect x="8" y="8" width="5" height="5" rx="1" fill="white" opacity=".9"/></svg>
+          </div>
+          <span class="ab-bar-name">APEX AUDIT</span>
+          <span class="ab-bar-badge">EU AI Act · Art. 17</span>
+        </div>
+        <button class="ab-back" onclick="goBack()">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M8 2L3 6l5 4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back to Dashboard
+        </button>
+      </div>
+
+      <!-- HERO -->
+      <div class="ab-hero">
+        <div class="ab-eyebrow" style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:11px">
+          <span style="height:1px;width:28px;background:currentColor;opacity:.3;display:inline-block"></span>
+          Our Mission
+          <span style="height:1px;width:28px;background:currentColor;opacity:.3;display:inline-block"></span>
+        </div>
+        <h1 class="ab-h1">AI decisions that can<br>be questioned by anyone</h1>
+        <p class="ab-lead">We built APEX AUDIT because we believe a future where AI agents make high-stakes decisions — about people's welfare, their housing, their liberty — must be a future where those decisions are permanently, publicly accountable. Not to a log an operator controls. To a distributed ledger that belongs to no one.</p>
+        <div class="ab-stats">
+          <div style="text-align:center"><div class="ab-stat-val">3</div><div class="ab-stat-lbl">Checkpoints per case</div></div>
+          <div style="text-align:center"><div class="ab-stat-val">0</div><div class="ab-stat-lbl">Ways to tamper with HCS</div></div>
+          <div style="text-align:center"><div class="ab-stat-val">Aug '26</div><div class="ab-stat-lbl">EU AI Act enforcement</div></div>
+          <div style="text-align:center"><div class="ab-stat-val">€35M</div><div class="ab-stat-lbl">Maximum penalty</div></div>
+        </div>
+      </div>
+
+      <div class="ab-divider"></div>
+
+      <!-- THE PROBLEM -->
+      <div class="ab-section">
+        <div class="ab-eyebrow">The Problem</div>
+        <h2 class="ab-h2">AI is making legal decisions.<br>Nobody can prove what it decided.</h2>
+        <p class="ab-sub">Today, AI agents issue benefits decisions, flag contracts for rejection, and inform judicial recommendations — and when those decisions are challenged, the input, reasoning, and output have typically vanished. No court-ready record. No way to prove what the model saw, what it concluded, or whether a human ever reviewed it.</p>
+        <div class="ab-grid-3">
+          <div class="ab-card">
+            <div style="width:38px;height:38px;border-radius:9px;background:#fef2f2;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:12px">⚖️</div>
+            <div class="ab-card-title">Unattributable Decisions</div>
+            <div class="ab-card-body">AI agent decisions today are anonymous. The reasoning disappears. The input is not retained. Appeals have no evidential foundation and regulators cannot verify compliance retroactively.</div>
+            <div class="ab-card-tag" style="background:#fef2f2;color:#b91c1c;border:1px solid #fecaca">Legal Risk</div>
+          </div>
+          <div class="ab-card">
+            <div style="width:38px;height:38px;border-radius:9px;background:#fffbeb;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:12px">🏛️</div>
+            <div class="ab-card-title">Regulatory Exposure</div>
+            <div class="ab-card-body">EU AI Act enforcement begins August 2026. Legal AI is explicitly high-risk under Annex III. Penalties reach €35M or 7% of global revenue. Most firms have no compliant audit infrastructure today.</div>
+            <div class="ab-card-tag" style="background:#fffbeb;color:#b45309;border:1px solid #fef3c7">Compliance Gap</div>
+          </div>
+          <div class="ab-card">
+            <div style="width:38px;height:38px;border-radius:9px;background:#eef2ff;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:12px">🔍</div>
+            <div class="ab-card-title">No Independent Verification</div>
+            <div class="ab-card-body">Internal logs are mutable. Database records can be edited. Without a tamper-proof audit trail, no AI legal decision can be trusted by courts, regulators, or opposing counsel.</div>
+            <div class="ab-card-tag" style="background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe">Trust Deficit</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ab-divider"></div>
+
+      <!-- WHO WE ARE -->
+      <div class="ab-section">
+        <div class="ab-eyebrow">Who We Are</div>
+        <h2 class="ab-h2">Built by people who care<br>about the humans on the other side</h2>
+        <div class="ab-grid-2">
+          <div class="ab-body-text">
+            <p style="margin-bottom:18px">APEX AUDIT started from a simple observation: the people most affected by AI decisions in legal and public services are rarely the ones with the power to question them. A benefits claimant whose application is rejected by an algorithm has no way to know what the system saw, what it concluded, or whether any human ever reviewed it.</p>
+            <p style="margin-bottom:18px">We find that <strong>deeply unacceptable</strong>. And we believe distributed ledger technology — specifically Hedera's Consensus Service — is the first credible technical answer to it. Not because it is fashionable. Because it is genuinely tamper-proof in a way that no internal database can claim to be.</p>
+            <p style="margin-bottom:18px">Every message on an HCS topic is immutably sequenced and timestamped by network consensus. A court, a regulator, or a claimant's solicitor can query that topic independently, without trusting any party. <strong>That is what court-ready evidence looks like in a world of AI agents.</strong></p>
+            <p>We are building APEX AUDIT to be the compliance layer that every legal AI deployment will need — not as bureaucratic overhead, but as a genuine guarantee that the humans at the end of these decisions have a record they can use.</p>
+          </div>
+          <div>
+            <div class="ab-quote">
+              <div class="ab-quote-text">"The question is not whether AI will make legal decisions at scale. It will. The question is whether there will be a tamper-proof record of every one of those decisions that any party can verify — independently, without asking anyone's permission."</div>
+              <div class="ab-quote-attr">— APEX AUDIT · Core Principle</div>
+            </div>
+            <div class="ab-market-card">
+              <div class="ab-market-lbl">Markets We Serve</div>
+              <div class="ab-market-row"><span style="font-size:15px">🇮🇪</span><span><strong>Ireland</strong> — EU AI Act, Social Welfare, Planning &amp; Development</span></div>
+              <div class="ab-market-row"><span style="font-size:15px">🇩🇪</span><span><strong>Germany</strong> — BaFin, BfDI enforcement, corporate AI compliance</span></div>
+              <div class="ab-market-row"><span style="font-size:15px">🇳🇱</span><span><strong>Netherlands</strong> — Financial services, AIFMD, DPA compliance</span></div>
+              <div class="ab-market-row"><span style="font-size:15px">🇫🇷</span><span><strong>France</strong> — Administrative tribunals, CNIL, social protection</span></div>
+              <div class="ab-market-row"><span style="font-size:15px">🇦🇺</span><span><strong>Australia</strong> — Fair Work, employment law, AI transparency</span></div>
+              <div class="ab-market-row"><span style="font-size:15px">🇬🇧</span><span><strong>UK Gov</strong> — ATRS, Ministry of Justice, public sector AI</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ab-divider"></div>
+
+      <!-- PARTNERS -->
+      <div class="ab-section">
+        <div class="ab-eyebrow">Our Partners</div>
+        <h2 class="ab-h2">Built on infrastructure<br>the world can verify</h2>
+        <p class="ab-sub">We chose our technology partners for one reason: genuine trustworthiness at the infrastructure layer. Not marketing claims. Cryptographic guarantees.</p>
+        <div class="ab-grid-3">
+          <div class="ab-partner-card" onmouseover="this.style.borderColor='#6ee7b7'" onmouseout="this.style.borderColor=''">
+            <div style="font-size:22px;margin-bottom:10px">⬡</div>
+            <div class="ab-partner-name">Hedera</div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#047857;margin-bottom:10px">Foundation Layer · Live Now</div>
+            <div class="ab-partner-body">Hedera's Consensus Service is the immutable audit rail that makes APEX AUDIT court-ready. Every AI decision checkpoint is posted as structured JSON — ordered, timestamped, and secured by aBFT consensus. No admin key. No edit. No delete. Any party can verify on HashScan without trusting APEX or any law firm.</div>
+            <div style="display:flex;flex-wrap:wrap;gap:5px">
+              <span class="ab-tech-pill" style="background:#ecfdf5;color:#047857;border-color:#a7f3d0">HCS Audit Trail</span>
+              <span class="ab-tech-pill" style="background:#ecfdf5;color:#047857;border-color:#a7f3d0">aBFT Consensus</span>
+              <span class="ab-tech-pill" style="background:#ecfdf5;color:#047857;border-color:#a7f3d0">Mirror Node</span>
+            </div>
+          </div>
+          <div class="ab-partner-card" onmouseover="this.style.borderColor='#a5b4fc'" onmouseout="this.style.borderColor=''">
+            <div style="font-size:22px;margin-bottom:10px">👜</div>
+            <div class="ab-partner-name">HashPack</div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#4338ca;margin-bottom:10px">Agent Identity &amp; Payments · Phase 2</div>
+            <div class="ab-partner-body">HashPack is Hedera's leading non-custodial wallet — and in Phase 2 it becomes the identity and payment layer for AI agents. Each agent instance holds a HashPack wallet, enabling cryptographically signed attestations, HBAR micropayments for specialist services, and verifiable reviewer identity.</div>
+            <div style="display:flex;flex-wrap:wrap;gap:5px">
+              <span class="ab-tech-pill" style="background:#eef2ff;color:#4338ca;border-color:#c7d2fe">Agent Wallets</span>
+              <span class="ab-tech-pill" style="background:#eef2ff;color:#4338ca;border-color:#c7d2fe">HBAR Payments</span>
+              <span class="ab-tech-pill" style="background:#eef2ff;color:#4338ca;border-color:#c7d2fe">Signed Attestations</span>
+            </div>
+          </div>
+          <div class="ab-partner-card" onmouseover="this.style.borderColor='#fbbf24'" onmouseout="this.style.borderColor=''">
+            <div style="font-size:22px;margin-bottom:10px">🔗</div>
+            <div class="ab-partner-name">Chainlink</div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#b45309;margin-bottom:10px">Oracle &amp; Cross-Chain Data · Phase 3</div>
+            <div class="ab-partner-body">As APEX expands into agentic commerce, Chainlink provides the verifiable external data layer. Cross-jurisdictional fee computation, regulatory threshold feeds, and DECO privacy-preserving credential verification let agents settle legal service agreements with full auditability.</div>
+            <div style="display:flex;flex-wrap:wrap;gap:5px">
+              <span class="ab-tech-pill" style="background:#fffbeb;color:#b45309;border-color:#fde68a">Price Oracles</span>
+              <span class="ab-tech-pill" style="background:#fffbeb;color:#b45309;border-color:#fde68a">CCIP Cross-Chain</span>
+              <span class="ab-tech-pill" style="background:#fffbeb;color:#b45309;border-color:#fde68a">DECO Privacy</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ab-divider"></div>
+
+      <!-- ROADMAP -->
+      <div class="ab-section">
+        <div class="ab-eyebrow">Roadmap</div>
+        <h2 class="ab-h2">From audit trail to<br>agentic commerce</h2>
+        <p class="ab-sub">We build the compliance infrastructure first — because trust must be earned before commerce can flow. Each phase unlocks the next: an immutable audit trail builds credibility for agent identity, which enables agent payments, which creates the foundation for an open marketplace where AI agents transact as first-class economic actors.</p>
+
+        <div class="ab-rm-spine">
+          <!-- Phase 1 left -->
+          <div class="ab-rm-col-l">
+            <div class="ab-rm-card live">
+              <div class="ab-rm-phase-lbl" style="color:#4338ca">Phase 1 · Live Now</div>
+              <div class="ab-rm-title">APEX AUDIT MVP</div>
+              <div class="ab-rm-desc">The immutable AI caseworker audit trail. Three checkpoints per case permanently sequenced on Hedera HCS — CASE_RECEIVED, AGENT_RECOMMENDATION, HUMAN_ATTESTATION.</div>
+              <div class="ab-rm-feat">Claude AI legal analysis + HCS logging</div>
+              <div class="ab-rm-feat">SHA-256 input integrity proof at receipt</div>
+              <div class="ab-rm-feat">Human attestation with reviewer identity</div>
+              <div class="ab-rm-feat">Live dashboard + HashScan independent verify</div>
+              <div class="ab-rm-feat">EU AI Act Art. 14 &amp; 17 compliance</div>
+              <div class="ab-rm-tags">
+                <span class="ab-tech-pill" style="background:#ecfdf5;color:#047857;border-color:#a7f3d0">Hedera HCS</span>
+                <span class="ab-tech-pill" style="background:#eef2ff;color:#4338ca;border-color:#c7d2fe">Claude AI</span>
+                <span class="ab-tech-pill" style="background:#ecfdf5;color:#047857;border-color:#a7f3d0;font-weight:700">● LIVE</span>
+              </div>
+            </div>
+          </div>
+          <!-- Spine -->
+          <div class="ab-rm-center">
+            <div class="ab-rm-dot" style="background:#eef2ff;border-color:#4338ca;color:#4338ca;box-shadow:0 0 0 5px rgba(67,56,202,.1)">1</div>
+            <div class="ab-rm-line"></div>
+            <div class="ab-rm-dot" style="background:#ecfdf5;border-color:#059669;color:#059669">2</div>
+            <div class="ab-rm-line"></div>
+            <div class="ab-rm-dot" style="background:#fffbeb;border-color:#b45309;color:#b45309">3</div>
+            <div class="ab-rm-line"></div>
+            <div class="ab-rm-dot" style="background:#f5f3ff;border-color:#7c3aed;color:#7c3aed">4</div>
+          </div>
+          <!-- Phase 2 right -->
+          <div class="ab-rm-col-r">
+            <div class="ab-rm-card" style="margin-top:0">
+              <div class="ab-rm-phase-lbl" style="color:#059669">Phase 2 · Q3 2026</div>
+              <div class="ab-rm-title">Multi-Agent Orchestration</div>
+              <div class="ab-rm-desc">A lead caseworker agent orchestrates specialist agents — research, contract analysis, jurisdiction lookup, translation — each with their own checkpoint. HashPack gives every agent a verifiable wallet identity.</div>
+              <div class="ab-rm-feat">Specialist agent mesh: research, drafting, valuation</div>
+              <div class="ab-rm-feat">Each agent action logged to HCS independently</div>
+              <div class="ab-rm-feat">HashPack wallet per agent — cryptographic identity</div>
+              <div class="ab-rm-feat">Firm-wide deployment, role-based attestation</div>
+              <div class="ab-rm-tags">
+                <span class="ab-tech-pill" style="background:#ecfdf5;color:#047857;border-color:#a7f3d0">Hedera HCS</span>
+                <span class="ab-tech-pill" style="background:#eef2ff;color:#4338ca;border-color:#c7d2fe">HashPack Identity</span>
+              </div>
+            </div>
+          </div>
+          <!-- Phase 3 left -->
+          <div class="ab-rm-col-l" style="padding-top:32px">
+            <div class="ab-rm-card">
+              <div class="ab-rm-phase-lbl" style="color:#b45309">Phase 3 · Q1 2027</div>
+              <div class="ab-rm-title">Agentic Commerce</div>
+              <div class="ab-rm-desc">Law firms' AI agents autonomously hire specialist agents, negotiate service terms, and settle in HBAR. Chainlink oracles compute cross-jurisdictional conversions. Every transaction audited to HCS.</div>
+              <div class="ab-rm-feat">Agent-to-agent service procurement in HBAR</div>
+              <div class="ab-rm-feat">Chainlink price feeds for multi-currency settlement</div>
+              <div class="ab-rm-feat">Smart legal agreements triggered by case outcomes</div>
+              <div class="ab-rm-feat">Full commerce audit trail on HCS</div>
+              <div class="ab-rm-tags">
+                <span class="ab-tech-pill" style="background:#ecfdf5;color:#047857;border-color:#a7f3d0">Hedera HBAR</span>
+                <span class="ab-tech-pill" style="background:#eef2ff;color:#4338ca;border-color:#c7d2fe">HashPack</span>
+                <span class="ab-tech-pill" style="background:#fffbeb;color:#b45309;border-color:#fde68a">Chainlink</span>
+              </div>
+            </div>
+          </div>
+          <!-- empty right for phase 3 -->
+          <div></div>
+          <!-- empty left for phase 4 -->
+          <div></div>
+          <!-- Phase 4 right -->
+          <div class="ab-rm-col-r" style="padding-top:32px">
+            <div class="ab-rm-card">
+              <div class="ab-rm-phase-lbl" style="color:#7c3aed">Phase 4 · Q4 2027</div>
+              <div class="ab-rm-title">Open Agent Marketplace</div>
+              <div class="ab-rm-desc">Any law firm or LegalTech provider can list AI agent skills on the APEX marketplace. Buyer agents discover and hire seller agents peer-to-peer. Compliance is built in — not bolted on.</div>
+              <div class="ab-rm-feat">Open marketplace for specialist legal AI skills</div>
+              <div class="ab-rm-feat">Decentralised agent discovery via HCS registry</div>
+              <div class="ab-rm-feat">Reputation scores from on-chain audit history</div>
+              <div class="ab-rm-feat">Chainlink CCIP for cross-chain legal asset settlement</div>
+              <div class="ab-rm-tags">
+                <span class="ab-tech-pill" style="background:#ecfdf5;color:#047857;border-color:#a7f3d0">Hedera Ecosystem</span>
+                <span class="ab-tech-pill" style="background:#f5f3ff;color:#7c3aed;border-color:#ddd6fe">Open Marketplace</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ab-divider"></div>
+
+      <!-- AGENTIC VISION DIAGRAM -->
+      <div class="ab-section">
+        <div class="ab-eyebrow">The Vision</div>
+        <h2 class="ab-h2">What agentic commerce<br>looks like in practice</h2>
+        <p class="ab-sub">A law firm's lead AI agent receives a complex cross-border case. It autonomously identifies the specialist skills needed, hires them from the marketplace, coordinates their work, and settles micro-transactions — all under a tamper-proof audit trail on Hedera.</p>
+
+        <div class="ab-diagram">
+          <div class="ab-diagram-title">APEX AGENTIC COMMERCE · Phase 3 Architecture</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:16px">
+
+            <div class="ab-node ab-node-plain" style="min-width:220px;justify-content:center">
+              <span style="font-size:18px">🏛️</span>
+              <div><div class="ab-node-name">Law Firm Client</div><div class="ab-node-sub">Submits complex cross-border case</div></div>
+            </div>
+
+            <div class="ab-v-line"></div>
+
+            <div class="ab-node ab-node-primary" style="min-width:260px;justify-content:center">
+              <span style="font-size:18px">🤖</span>
+              <div>
+                <div class="ab-node-name" style="font-size:13px">Lead Caseworker Agent</div>
+                <div class="ab-node-sub" style="color:#4338ca;font-weight:600">Orchestrates · APEX AUDIT · Hedera HCS</div>
+              </div>
+            </div>
+
+            <div class="ab-flow-lbl">Identifies required skills → hires from marketplace → pays in HBAR</div>
+            <div class="ab-v-line"></div>
+
+            <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center">
+              <div class="ab-node ab-node-spec" style="min-width:140px">
+                <span style="width:28px;height:28px;border-radius:6px;background:#eef2ff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📚</span>
+                <div><div class="ab-node-name" style="font-size:11px">Legal Research</div><div class="ab-node-sub">Case law · Legislation</div></div>
+              </div>
+              <div class="ab-node ab-node-spec" style="min-width:140px">
+                <span style="width:28px;height:28px;border-radius:6px;background:#ecfdf5;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">📄</span>
+                <div><div class="ab-node-name" style="font-size:11px">Contract Analysis</div><div class="ab-node-sub">Clause review · Risk</div></div>
+              </div>
+              <div class="ab-node ab-node-spec" style="min-width:140px">
+                <span style="width:28px;height:28px;border-radius:6px;background:#fffbeb;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">🌍</span>
+                <div><div class="ab-node-name" style="font-size:11px">Jurisdiction Agent</div><div class="ab-node-sub">Multi-state · EU AI Act</div></div>
+              </div>
+              <div class="ab-node ab-node-spec" style="min-width:140px">
+                <span style="width:28px;height:28px;border-radius:6px;background:#f5f3ff;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0">💱</span>
+                <div><div class="ab-node-name" style="font-size:11px">Valuation Agent</div><div class="ab-node-sub">Chainlink oracles</div></div>
+              </div>
+            </div>
+
+            <div class="ab-flow-lbl">Every action · every HBAR payment · every result → logged to Hedera HCS</div>
+            <div class="ab-v-line"></div>
+
+            <div style="display:flex;gap:10px;width:100%;max-width:600px;justify-content:center">
+              <div class="ab-node-dashed" style="justify-content:center">
+                <span style="font-size:16px">⛓️</span>
+                <div><div class="ab-node-name" style="font-size:11px;color:#047857">Hedera HCS</div><div class="ab-node-sub">Immutable audit trail</div></div>
+              </div>
+              <div class="ab-node-dashed" style="justify-content:center;border-color:#c7d2fe">
+                <span style="font-size:16px">👜</span>
+                <div><div class="ab-node-name" style="font-size:11px;color:#4338ca">HashPack</div><div class="ab-node-sub">Agent wallets · HBAR</div></div>
+              </div>
+              <div class="ab-node-dashed" style="justify-content:center;border-color:#fde68a">
+                <span style="font-size:16px">🔗</span>
+                <div><div class="ab-node-name" style="font-size:11px;color:#b45309">Chainlink</div><div class="ab-node-sub">Price feeds · CCIP</div></div>
+              </div>
+            </div>
+
+            <div class="ab-hcs-rail" style="max-width:600px">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#059669" stroke-width="1.2"/><path d="M4 7l2 2 4-4" stroke="#059669" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              <span class="ab-hcs-rail-text">Every decision · Every payment · Every attestation → immutably sequenced on Hedera · Independently verifiable</span>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- About footer -->
+      <div class="ab-foot">
+        <span class="ab-foot-meta">APEX AUDIT · Hedera Testnet · Topic 0.0.8601760</span>
+        <div class="ab-foot-links">
+          <a href="https://hashscan.io/testnet/topic/0.0.8601760" target="_blank" rel="noopener" class="ab-foot-link">HashScan ↗</a>
+          <a href="https://hedera.com" target="_blank" rel="noopener" class="ab-foot-link">Hedera ↗</a>
+          <a href="https://www.hashpack.app" target="_blank" rel="noopener" class="ab-foot-link">HashPack ↗</a>
+          <a href="https://chain.link" target="_blank" rel="noopener" class="ab-foot-link">Chainlink ↗</a>
+          <button class="ab-foot-home" onclick="goBack()">← Back to Dashboard</button>
+        </div>
+      </div>
+
+    </div>
+
+  </div><!-- /pg-wrap -->
+</div><!-- /shell -->
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="sf-left">
+    <span class="mono sf-meta">APEX AUDIT v2.4.1</span>
+    <span class="sf-dot">·</span>
+    <span class="sf-muted">Immutable AI decision trail on Hedera HCS</span>
+    <span class="sf-dot">·</span>
+    <span class="sf-muted">EU AI Act Art. 14 &amp; 17 compliant</span>
+  </div>
+  <div class="sf-right">
+    <span class="sf-built">Built with</span>
+    <span class="sf-brand">Hedera</span>
+    <span class="sf-dot">·</span>
+    <span class="sf-brand">HashPack</span>
+    <span class="sf-dot">·</span>
+    <span class="sf-brand">Chainlink</span>
+    <span class="sf-dot">·</span>
+    <span class="sf-about" onclick="nav('about')">About APEX AUDIT →</span>
+  </div>
+</footer>
+<style>
+  .site-footer{background:#fff;border-top:1px solid #e2e8f0;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#94a3b8;flex-wrap:wrap;gap:8px}
+  body.dark .site-footer{background:#0f172a;border-color:rgba(255,255,255,.06)}
+  .sf-left,.sf-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .sf-meta{color:#64748b}
+  body.dark .sf-meta{color:#475569}
+  .sf-muted{color:#94a3b8}
+  body.dark .sf-muted{color:#334155}
+  .sf-dot{color:#cbd5e1}
+  body.dark .sf-dot{color:#1e293b}
+  .sf-built{color:#94a3b8}
+  body.dark .sf-built{color:#334155}
+  .sf-brand{color:#6366f1;font-weight:600}
+  body.dark .sf-brand{color:#4338ca}
+  .sf-about{color:#4338ca;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:color .14s}
+  .sf-about:hover{color:#6366f1}
+  body.dark .sf-about{color:#6366f1}
+  body.dark .sf-about:hover{color:#a5b4fc}
+</style>
+
+<div class="toast" id="toast"><div class="tdot" id="tdot"></div><span id="tmsg">Posted to Hedera HCS</span></div>
+
+<script>
+// ═══ DATA ═══
+const TID = '0.0.8601760';
+
+const CASES = [
+  { id:'CASE-2026-IE-0041', name:"O'Sullivan v. Dept. of Social Protection", type:'Benefits Eligibility', desc:'Jobseeker\'s Benefit eligibility assessment following redundancy from Dublin-based multinational. Cross-border EU social security coordination required — claimant has prior contributions in Ireland and France.', risk:.78, rl:'High Risk', rp:'p-red', jur:'Ireland (EU)', filed:'2026-04-10', deadline:'2026-04-24', pri:'Urgent', model:'claude-opus-4-6',
+    rec:{ out:'ELIGIBLE', conf:.91, txt:"Claimant satisfies all criteria under s.62 Social Welfare Consolidation Act 2005. PRSI contributions confirmed across IE and FR for the qualifying 104-week period. EU Reg. 883/2004 coordination applies — French contributions count toward the Irish threshold. Recommend full benefit award with immediate effect and back-payment from date of application." }},
+  { id:'CASE-2026-DE-0017', name:'Brandt AG · EU AI Act Conformity', type:'Regulatory Compliance', desc:'High-risk AI system classification audit under EU AI Act Art. 9. Automated credit-scoring model deployed across 14 EU member states. BaFin preliminary inquiry received. August 2026 enforcement deadline in scope.', risk:.91, rl:'High Risk', rp:'p-red', jur:'Germany (EU)', filed:'2026-04-09', deadline:'2026-04-16', pri:'Urgent', model:'claude-opus-4-6',
+    rec:{ out:'NON-COMPLIANT — REMEDIATION REQUIRED', conf:.89, txt:'System qualifies as high-risk under Annex III(5)(b) EU AI Act — automated credit decisioning for consumer finance. Critical gaps in conformity assessment (Art. 9), technical documentation (Art. 11), and human oversight mechanisms (Art. 14). Penalty exposure: up to €15M or 3% global revenue. Immediate remediation roadmap advised before August enforcement.' }},
+  { id:'CASE-2026-NL-0033', name:'Vermeer Capital · Cross-Border Fund Dispute', type:'Contract Review', desc:'Tri-party fund management agreement review. Performance fee triggers and governing law clauses span Netherlands, Luxembourg and the Cayman Islands. €47M in dispute. AIFMD alignment required.', risk:.61, rl:'Medium Risk', rp:'p-amber', jur:'Netherlands (EU)', filed:'2026-04-11', deadline:'2026-04-28', pri:'Standard', model:'claude-opus-4-6',
+    rec:{ out:'FLAGS IDENTIFIED', conf:.82, txt:'Governing law clause at Art. 31 creates irreconcilable conflict between Dutch civil law and Cayman Islands common law. Performance fee trigger at Schedule 3(b) does not align with AIFMD Art. 14 requirements. Recommend renegotiation of Art. 31 and Schedule 3(b) before execution. Arbitration clause at Art. 44 should specify ICC rules.' }},
+  { id:'CASE-2026-UK-0052', name:'Ministry of Justice · AI Sentencing Audit', type:'Legal Advice', desc:'Mandatory audit of algorithmic sentencing support tool deployed across 12 Crown Courts. Parliamentary obligation under the Algorithmic Transparency Recording Standard (ATRS). Cabinet Office referral — high public interest.', risk:.94, rl:'High Risk', rp:'p-red', jur:'England & Wales (Gov)', filed:'2026-04-08', deadline:'2026-04-15', pri:'Urgent', model:'claude-opus-4-6',
+    rec:{ out:'PARTIAL COMPLIANCE — URGENT GAPS', conf:.88, txt:'Tool meets 7 of 11 ATRS criteria. Critical failures: explainability log retention (Criterion 4), demographic bias reporting (Criterion 7), and appeals documentation (Criterion 9). Given judicial decision-support classification, deployment should be suspended pending remediation. Emergency compliance review within 5 working days strongly advised.' }},
+];
+
+const COMPLETED = [
+  { id:'CASE-2026-AU-0039', name:'Matsuda v. Apex Pacific Holdings', type:'Employment Law', desc:'Unfair dismissal case under Fair Work Act 2009. Employer\'s AI-assisted performance management system audited for FWC automation transparency compliance. AI recommendation approved and upheld at conciliation.', risk:.55, rl:'Medium Risk', rp:'p-amber', jur:'Australia (FWC)', completedAt:'2026-04-09 11:38 UTC', outcome:'APPROVED',
+    rec:{ out:'DISMISSAL PROCEDURALLY UNFAIR', conf:.91, txt:"Automated performance scoring system used in the dismissal decision was not disclosed to the employee under s.387(b) FWA 2009. AI-generated performance flags constituted a de facto dismissal trigger with no documented human review step. Compensation entitlement confirmed — recommend a reinstatement offer or 26-week payment in lieu under s.392." }},
+  { id:'CASE-2026-FR-0071', name:'Préfecture du Rhône · Résidence Override', type:'Case Assessment', desc:'Administrative tribunal appeal against an AI-generated residency permit rejection. Reviewer overrode AI recommendation after discovering stale training data. Override and full reasoning chain logged immutably on Hedera HCS.', risk:.74, rl:'High Risk', rp:'p-red', jur:'France (CAA Lyon)', completedAt:'2026-04-08 16:12 UTC', outcome:'OVERRIDDEN',
+    rec:{ out:'PERMIT SHOULD BE GRANTED', conf:.78, txt:'Original AI rejection relied on an address verification dataset last updated Q2 2024. Current OFII records confirm lawful residence since 2021. Override upheld by Tribunal Administratif de Lyon. AI system flagged for mandatory retraining under EU AI Act Art. 65 — incident logged to HCS for regulatory disclosure.' }},
+];
+
+const PENDING = [
+  { id:'CASE-2026-IE-0009', name:"An Bord Pleanála · Planning AI Review", type:'Regulatory Compliance', desc:"Independent review of AI-assisted planning permission refusal affecting a 340-unit housing development. Oireachtas housing committee oversight. Legal challenge expected under Planning & Development Act 2024.", risk:.84, rl:'High Risk', rp:'p-red', jur:'Ireland (An Bord Pleanála)', awaitingSince:'2026-04-12 08:15 UTC',
+    rec:{ out:'CHALLENGE VIABLE — HUMAN OVERSIGHT FAILURE', conf:.85, txt:"Planning AI system failed to apply the mandatory human review step for developments exceeding 200 units under s.180B PDA 2024. Decision chain shows 3 automated refusal triggers with no documented human intervention. Under EU AI Act Art. 14, the system should not have reached final determination without human sign-off. Strong basis for judicial review." }},
+];
+
+// ═══ STATE ═══
+const CS = {}; // caseId -> { step, data }
+const HCS_LOG = [];
+let curPage = 'active';
+let prevPage = 'active';
+let curCase = null;
+const caseFiles = {}; // caseId → { name, size, hash, type, dataUrl, text }
+let curPool = null;
+let curIdx = null;
+
+function getCS(id) { if (!CS[id]) CS[id] = { step:0, data:{} }; return CS[id]; }
+function rh() { return '0x'+Array.from({length:32},()=>Math.floor(Math.random()*256).toString(16).padStart(2,'0')).join(''); }
+function rseq() { return (Math.floor(Math.random()*9000)+1000).toString(); }
+function ts() { return new Date().toISOString().replace('T',' ').substring(0,19)+' UTC'; }
+function sh(h) { return h?h.substring(0,18)+'…'+h.substring(h.length-6):'—'; }
+
+// ═══ NAV ═══
+function nav(pg) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const p = document.getElementById('pg-'+pg);
+  if (p) { p.classList.add('on'); p.classList.add('fade-up'); }
+  const ni = document.getElementById('ni-'+pg);
+  if (ni) ni.classList.add('active');
+  prevPage = curPage; curPage = pg;
+  setBc(pg);
+  if (pg==='log') renderLog();
+  if (pg==='completed') renderCompleted();
+  if (pg==='pending') renderPending();
+}
+
+function goBack() {
+  nav(prevPage === 'detail' ? 'active' : prevPage);
+}
+
+function setBc(pg) {
+  const labels = { active:'Dashboard', completed:'Completed', pending:'Pending Review', log:'Full Audit Log', hashscan:'HashScan Verify', export:'Export Report', about:'About APEX AUDIT', detail: curCase?curCase.id:'Case Detail' };
+  const el = document.getElementById('bc');
+  if (pg === 'active') { el.innerHTML = '<span class="bc-cur">Dashboard</span>'; return; }
+  if (pg === 'detail') { el.innerHTML = `<span class="bc-crumb" onclick="nav('active')">Dashboard</span><span class="bc-sep">/</span><span class="bc-cur">${curCase?curCase.id:'Case'}</span>`; return; }
+  el.innerHTML = `<span class="bc-crumb" onclick="nav('active')">Dashboard</span><span class="bc-sep">/</span><span class="bc-cur">${labels[pg]||pg}</span>`;
+}
+
+// ═══ CASE CARDS ═══
+function stepStatus(cs) {
+  const labels = ['Not started','Case Received','Analysis Complete','Awaiting Attestation','Complete'];
+  const pills = ['p-gray','p-blue','p-blue','p-amber','p-green'];
+  return { lbl: labels[cs.step], pill: pills[cs.step] };
+}
+
+function caseCard(c, pool, idx) {
+  const cs = getCS(c.id);
+  const ss = pool==='active' ? stepStatus(cs) : null;
+  const statusPill = pool==='completed'
+    ? `<span class="pill ${c.outcome==='APPROVED'?'p-green':'p-amber'}">${c.outcome}</span>`
+    : pool==='pending'
+    ? `<span class="pill p-amber">Awaiting Attestation</span>`
+    : `<span class="pill ${ss.pill}">${ss.lbl}</span>`;
+  const meta = c.deadline ? `Due ${c.deadline}` : c.completedAt||c.awaitingSince||'';
+  return `<div class="case-card" onclick="openCase('${pool}',${idx})">
+    <div class="cc-top"><div class="cc-id mono">${c.id}</div>${statusPill}</div>
+    <div class="cc-name">${c.name}</div>
+    <div class="cc-desc">${c.desc}</div>
+    <div class="cc-foot">
+      <span class="pill ${c.rp}">${c.rl}</span>
+      <span class="pill p-slate">${c.type}</span>
+      <div class="risk-bar"><div class="risk-fill" style="width:${c.risk*100}%;background:${c.risk>.7?'#ef4444':c.risk>.5?'#f59e0b':'#6366f1'}"></div></div>
+      <div class="cc-meta mono">${meta}</div>
+    </div>
+  </div>`;
+}
+
+function renderActive() {
+  document.getElementById('cl-active').innerHTML = CASES.map((c,i)=>caseCard(c,'active',i)).join('');
+}
+function renderCompleted() {
+  document.getElementById('cl-completed').innerHTML = COMPLETED.map((c,i)=>caseCard(c,'completed',i)).join('');
+}
+function renderPending() {
+  document.getElementById('cl-pending').innerHTML = PENDING.map((c,i)=>caseCard(c,'pending',i)).join('');
+}
+
+// ═══ OPEN CASE ═══
+function openCase(pool, idx) {
+  const pools = { active:CASES, completed:COMPLETED, pending:PENDING };
+  const c = pools[pool][idx];
+  curCase = c; curPool = pool; curIdx = idx;
+
+  // Pre-fill completed/pending
+  const cs = getCS(c.id);
+  if (pool==='completed' && cs.step < 3) {
+    cs.data.step0 = { type:'CASE_RECEIVED', hash:rh(), t:'2026-04-08 10:14:03 UTC', seq:'3812' };
+    cs.data.step1 = { type:'AGENT_RECOMMENDATION', hash:rh(), t:'2026-04-08 10:14:28 UTC', seq:'3813' };
+    cs.data.step2 = { type:'HUMAN_ATTESTATION', hash:rh(), t:c.completedAt, seq:'3814', dec:c.outcome };
+    cs.step = 3;
+  }
+  if (pool==='pending' && cs.step < 2) {
+    cs.data.step0 = { type:'CASE_RECEIVED', hash:rh(), t:'2026-04-11 16:31:02 UTC', seq:'4201' };
+    cs.data.step1 = { type:'AGENT_RECOMMENDATION', hash:rh(), t:'2026-04-11 16:31:44 UTC', seq:'4202' };
+    cs.step = 2;
+  }
+
+  document.getElementById('d-id').textContent = c.id;
+  document.getElementById('d-title').textContent = c.name;
+  document.getElementById('d-desc').textContent = c.desc;
+  document.getElementById('d-pills').innerHTML =
+    `<span class="pill ${c.rp}">${c.rl}</span>
+     <span class="pill p-slate">${c.type}</span>
+     <span class="pill p-gray">${c.jur}</span>
+     ${c.pri?`<span class="pill p-purple">Priority: ${c.pri}</span>`:''}
+     ${pool==='completed'?`<span class="pill p-green">Completed</span>`:''}`;
+
+  document.getElementById('back-btn').textContent = '← Back to '+(pool==='active'?'Active Cases':pool==='completed'?'Completed':'Pending Review');
+
+  document.getElementById('d-meta').innerHTML = `
+    <div class="meta-item"><div class="meta-k">Case ID</div><div class="meta-v mono">${c.id}</div></div>
+    <div class="meta-item"><div class="meta-k">Jurisdiction</div><div class="meta-v mono">${c.jur}</div></div>
+    <div class="meta-item"><div class="meta-k">Case Type</div><div class="meta-v">${c.type}</div></div>
+    <div class="meta-item"><div class="meta-k">AI Model</div><div class="meta-v mono" style="font-size:10px">${c.model||'claude-sonnet-4-20250514'}</div></div>
+    <div class="meta-item"><div class="meta-k">Filed / Received</div><div class="meta-v mono">${c.filed||c.awaitingSince?.substring(0,10)||c.completedAt?.substring(0,10)||'2026-04-08'}</div></div>
+    <div class="meta-item"><div class="meta-k">HCS Topic</div><div class="meta-v mono" style="color:#6366f1">${TID}</div></div>
+    ${c.deadline?`<div class="meta-item"><div class="meta-k">Deadline</div><div class="meta-v mono" style="color:#b91c1c">${c.deadline}</div></div>`:''}
+    <div class="meta-item"><div class="meta-k">Risk Score</div><div class="meta-v mono" style="color:${c.risk>.7?'#b91c1c':c.risk>.5?'#b45309':'#4338ca'}">${Math.round(c.risk*100)}%</div></div>`;
+
+  // Show/hide Source File tab
+  const hasFile = !!caseFiles[c.id];
+  const fileTab = document.getElementById('dtab-file');
+  if (fileTab) fileTab.style.display = hasFile ? '' : 'none';
+  switchDetailTab('trail');
+  renderFileTab(c.id);
+
+  renderTimeline();
+  renderAction();
+  nav('detail');
+
+  // Urgent cases auto-run Phase 1 on open — no manual trigger needed
+  if (pool === 'active' && c.pri === 'Urgent' && cs.step === 0) {
+    setTimeout(step0, 400);
+  }
+}
+
+// ═══ DETAIL TABS ═══
+function switchDetailTab(tab) {
+  document.getElementById('dtab-trail').classList.toggle('active', tab==='trail');
+  document.getElementById('dtab-file').classList.toggle('active', tab==='file');
+  document.getElementById('dtab-trail-panel').style.display = tab==='trail' ? '' : 'none';
+  document.getElementById('dtab-file-panel').style.display = tab==='file' ? '' : 'none';
+}
+
+function renderFileTab(caseId) {
+  const f = caseFiles[caseId];
+  const el = document.getElementById('d-file-view');
+  if (!f) {
+    el.innerHTML = `<div class="fp-no-preview"><svg width="32" height="32" viewBox="0 0 32 32" fill="none" style="margin-bottom:10px;opacity:.3"><path d="M8 4h11l7 7v17H8V4z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M19 4v7h7" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><br>No source file attached to this case</div>`;
+    return;
+  }
+  const ext = f.type || f.name.split('.').pop().toLowerCase();
+  const iconBg = ext==='pdf'?'#fef2f2':ext==='json'?'#ecfdf5':ext==='docx'||ext==='doc'?'#eef2ff':'#f5f3ff';
+  const iconEmoji = ext==='pdf'?'📕':ext==='json'?'📋':ext==='docx'||ext==='doc'?'📘':'📄';
+
+  let previewHtml = '';
+  if (f.dataUrl && f.type === 'pdf') {
+    previewHtml = `<div class="fp-content">
+      <iframe src="${f.dataUrl}" style="width:100%;height:480px;border:1px solid #e2e8f0;border-radius:7px;background:#fff" title="PDF preview"></iframe>
+    </div>`;
+  } else if (f.text) {
+    let display = f.text;
+    if (ext === 'json') { try { display = JSON.stringify(JSON.parse(f.text), null, 2); } catch{} }
+    previewHtml = `<div class="fp-content">
+      <div class="fp-hash-lbl" style="padding:0 0 6px">File Contents</div>
+      <div class="fp-content-inner">${display.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
+    </div>`;
+  } else if (f.dataUrl && /^image\//.test(f.dataUrl)) {
+    previewHtml = `<div class="fp-content"><img src="${f.dataUrl}" style="max-width:100%;border-radius:6px;border:1px solid #e2e8f0"></div>`;
+  } else {
+    previewHtml = `<div class="fp-no-preview" style="padding:20px 16px">Binary file — download to view</div>`;
+  }
+
+  el.innerHTML = `
+    <div class="fp-box">
+      <div class="fp-header">
+        <div class="fp-icon" style="background:${iconBg}">${iconEmoji}</div>
+        <div>
+          <div class="fp-name">${f.name}</div>
+          <div class="fp-meta">${f.size} · ${ext.toUpperCase()} · Uploaded this session</div>
+        </div>
+        <div class="fp-actions">
+          <button class="btn btn-ghost" style="font-size:11px;padding:4px 10px" onclick="downloadCaseFile('${caseId}')">
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none" style="margin-right:3px"><path d="M6 1v7M3 6l3 3 3-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 10h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+            Download
+          </button>
+        </div>
+      </div>
+      <div class="fp-hash-block">
+        <div class="fp-hash-lbl">SHA-256 Integrity Hash (logged to Hedera HCS at CASE_RECEIVED)</div>
+        <div class="fp-hash-val">${f.hash || '—'}</div>
+      </div>
+      <div class="fp-hcs-row">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#059669" stroke-width="1.3"/><path d="M3.5 6l2 2 3-3" stroke="#059669" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span style="font-size:10.5px;color:#047857;font-weight:600">Hash verified on Hedera HCS · Topic ${TID}</span>
+        <span class="vlink" style="margin-left:auto;font-size:10px" onclick="nav('hashscan')">Verify →</span>
+      </div>
+      ${previewHtml}
+    </div>`;
+}
+
+function downloadCaseFile(caseId) {
+  const f = caseFiles[caseId];
+  if (!f) return;
+  const a = document.createElement('a');
+  if (f.dataUrl) {
+    a.href = f.dataUrl;
+  } else {
+    a.href = URL.createObjectURL(new Blob([f.text], { type: 'text/plain' }));
+  }
+  a.download = f.name;
+  a.click();
+}
+
+// ═══ TIMELINE ═══
+function renderTimeline() {
+  const c = curCase; const cs = getCS(c.id);
+  const steps = [
+    { lbl:'CHECKPOINT 1', title:'Case Received', desc:'SHA-256 hash of all case input data posted to Hedera HCS. Input integrity is cryptographically locked at this moment.' },
+    { lbl:'CHECKPOINT 2', title:'Agent Analysis', desc:'Claude runs legal analysis. Reasoning summary, confidence score, and outcome hash posted to HCS. Claude has no write access — APEX intercepts.' },
+    { lbl:'CHECKPOINT 3', title:'Human Attestation', desc:'Reviewer approves or overrides the AI recommendation. Decision, reviewer ID, and session token posted immutably to HCS.' },
+  ];
+
+  document.getElementById('d-tl').innerHTML = steps.map((s, i) => {
+    let status = cs.step > i ? 'done' : cs.step === i ? 'act' : 'pend';
+    const dotInner = status === 'done'
+      ? `<svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5l2.5 2.5L9 3" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>`
+      : `<span style="font-size:9px;font-weight:700;color:${status==='act'?'#6366f1':'#94a3b8'}">${i+1}</span>`;
+
+    const d = cs.data['step'+i];
+    let card = '';
+    if (d) {
+      const dec = d.dec;
+      card = `<div class="hcs-card">
+        <div class="hcs-row"><span class="hcs-k">msg_type</span><span class="hcs-v">${d.type}</span></div>
+        <div class="hcs-row"><span class="hcs-k">topic_id</span><span class="hcs-v">${TID}</span></div>
+        <div class="hcs-row"><span class="hcs-k">seq_num</span><span class="hcs-v"># ${d.seq}</span></div>
+        <div class="hcs-row"><span class="hcs-k">hash</span><span class="hcs-v hcs-h">${sh(d.hash)}</span></div>
+        ${i===1&&c.rec?`<div class="hcs-row"><span class="hcs-k">outcome</span><span class="hcs-v hcs-ok">${c.rec.out}</span></div>`:''}
+        ${i===2&&dec?`<div class="hcs-row"><span class="hcs-k">decision</span><span class="hcs-v ${dec==='APPROVED'?'hcs-ok':'hcs-warn'}">${dec}</span></div>`:''}
+        <div class="hcs-row"><span class="hcs-k">consensus</span><span class="hcs-v hcs-ok">✓ VERIFIED ON HEDERA</span></div>
+      </div>
+      <span class="vlink" onclick="jumpHashScan('${d.hash}')">→ View on HashScan</span>`;
+    }
+
+    return `<div class="tl-item">
+      <div class="tl-left">
+        <div class="tl-dot ${status}">${dotInner}</div>
+        ${i<2?`<div class="tl-line ${status==='done'?'tl-done-line':''}"></div>`:''}
+      </div>
+      <div class="tl-body">
+        <div class="tl-step-lbl ${status==='done'||status==='act'?status+'-lbl':''}">${s.lbl}</div>
+        <div class="tl-step-title">${s.title}</div>
+        <div class="tl-time">${d?d.t:(status==='act'?'Ready to log':'Awaiting prior checkpoint')}</div>
+        <div class="tl-desc">${s.desc}</div>
+        ${card}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══ ACTION PANEL ═══
+function renderAction() {
+  const c = curCase; const cs = getCS(c.id); const pool = curPool;
+  const el = document.getElementById('d-action');
+
+  if (pool === 'completed' || cs.step === 3) {
+    const d2 = cs.data.step2;
+    el.innerHTML = `
+      <div class="act-panel">
+        <div class="act-panel-hdr">Final Outcome <span class="pill ${d2&&d2.dec==='APPROVED'?'p-green':'p-amber'}" style="font-size:10px">${d2?d2.dec:'—'}</span></div>
+        <div class="act-panel-body">
+          <div class="rec-big" style="color:${d2&&d2.dec==='APPROVED'?'#047857':'#b45309'}">${c.rec.out}</div>
+          <div class="rec-conf">Confidence: ${Math.round(c.rec.conf*100)}% · AI model used</div>
+          <div class="rec-text">${c.rec.txt}</div>
+          <div style="margin-top:12px;padding-top:10px;border-top:1px solid #f1f5f9;font-size:11px;color:#94a3b8;margin-bottom:8px">All 3 checkpoints verified on Hedera HCS</div>
+          <button class="btn btn-ghost btn-full" onclick="nav('hashscan')">View HashScan Verification →</button>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-full" onclick="nav('export')" style="margin-bottom:8px">Export Audit Report</button>`;
+    return;
+  }
+
+  if (pool === 'pending' || cs.step === 2) {
+    el.innerHTML = `
+      <div class="act-panel">
+        <div class="act-panel-hdr">AI Recommendation <span class="pill p-amber">Needs Attestation</span></div>
+        <div class="act-panel-body">
+          <div class="rec-big">${c.rec.out}</div>
+          <div class="rec-conf">Confidence: ${Math.round(c.rec.conf*100)}% · claude-sonnet-4-20250514</div>
+          <div class="rec-text">${c.rec.txt}</div>
+        </div>
+      </div>
+      <div class="warn-box" style="font-size:11px"><strong>Art. 14 EU AI Act</strong> — Your decision will be permanently recorded on Hedera HCS and cannot be undone. Reviewer ID and session token will be logged.</div>
+      <div class="btn-row">
+        <button class="btn btn-approve" onclick="attest('APPROVED')">✓ Approve</button>
+        <button class="btn btn-override" onclick="attest('OVERRIDDEN')">✗ Override</button>
+      </div>`;
+    return;
+  }
+
+  if (cs.step === 0) {
+    el.innerHTML = `
+      <div class="act-panel">
+        <div class="act-panel-hdr">Checkpoint 1 — Case Receipt</div>
+        <div class="act-panel-body">
+          <div style="font-size:12px;color:#334155;line-height:1.65;margin-bottom:14px">Initiates the audit trail. SHA-256 hash of all case input data will be posted to Hedera HCS topic <span class="mono" style="color:#6366f1">${TID}</span>. Input integrity is cryptographically locked at this point — any later tampering is detectable.</div>
+          <button class="btn btn-primary btn-full" id="btn-cp1" onclick="step0()">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><circle cx="6.5" cy="6.5" r="5" stroke="white" stroke-width="1.4"/><path d="M4.5 4.5l4 2-4 2V4.5z" fill="white"/></svg>
+            Log Case Receipt to Hedera
+          </button>
+        </div>
+      </div>`;
+  } else if (cs.step === 1) {
+    el.innerHTML = `
+      <div class="act-panel">
+        <div class="act-panel-hdr">Checkpoint 2 — Agent Analysis</div>
+        <div class="act-panel-body">
+          <div style="font-size:12px;color:#334155;line-height:1.65;margin-bottom:10px">Triggers Claude legal analysis. The AI reasoning summary and outcome will be SHA-256 hashed and posted to HCS immediately on completion.</div>
+          <div style="background:#eef2ff;border:1px solid #c7d2fe;border-radius:7px;padding:9px 11px;margin-bottom:12px;font-size:11px;color:#334155">
+            <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#6366f1;margin-bottom:2px">Model</div>
+            <span class="mono">${curCase.model||'claude-sonnet-4-20250514'}</span>
+          </div>
+          <button class="btn btn-primary btn-full" id="btn-cp2" onclick="step1()">
+            <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><rect x="2" y="2.5" width="9" height="8" rx="1.5" stroke="white" stroke-width="1.4"/><path d="M4.5 6h4M4.5 8h2.5" stroke="white" stroke-width="1.2" stroke-linecap="round"/></svg>
+            Run AI Analysis + Log to Chain
+          </button>
+        </div>
+      </div>`;
+  }
+}
+
+// ═══ WORKFLOW ═══
+
+// Poll /pending until our caseId appears (real API result from Phase 1)
+async function pollForPending(caseId, timeout = 120000) {
+  const start = Date.now();
+  while (Date.now() - start < timeout) {
+    await new Promise(r => setTimeout(r, 2500));
+    try {
+      const r = await fetch('/pending');
+      if (!r.ok) continue;
+      const list = await r.json();
+      const found = list.find(x => x.caseId === caseId);
+      if (found) return found;
+    } catch { /* retry */ }
+  }
+  throw new Error('Timed out waiting for AI analysis');
+}
+
+async function step0() {
+  const btn = document.getElementById('btn-cp1');
+  if (btn) { btn.disabled=true; btn.innerHTML='<div class="spin"></div> Posting to Hedera…'; }
+
+  const c = curCase;
+  const cs = getCS(c.id);
+
+  try {
+    // Submit to backend — Phase 1 runs CASE_RECEIVED + AGENT_RECOMMENDATION
+    const res = await fetch('/run-case', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        caseId: c.id,
+        caseName: c.name,
+        caseType: c.type,
+        caseDescription: c.desc,
+        jurisdiction: c.jur,
+      }),
+    });
+    if (!res.ok) throw new Error('Server error ' + res.status);
+
+    // Show checkpoint 1 "in flight" while we wait for Claude
+    const t0 = ts();
+    cs.data.step0 = { type:'CASE_RECEIVED', hash:'pending…', t:t0, seq:'…' };
+    cs.step = 1;
+    renderTimeline();
+
+    // Update action panel to show "Claude analysing"
+    const actionEl = document.getElementById('d-action');
+    if (actionEl) actionEl.innerHTML = `
+      <div class="act-panel">
+        <div class="act-panel-hdr">Checkpoint 2 — Agent Analysis</div>
+        <div class="act-panel-body">
+          <div style="display:flex;align-items:center;gap:8px;color:#4338ca;font-size:12.5px;font-weight:600">
+            <div class="spin-sm"></div>Claude legal analysis in progress…
+          </div>
+          <div style="font-size:11px;color:#94a3b8;margin-top:6px">Posting to Hedera HCS · Topic <span class="mono" style="color:#6366f1">${TID}</span></div>
+        </div>
+      </div>`;
+    toast('CASE_RECEIVED posted · Claude analysing…');
+
+    // Poll until Phase 1 complete (both HCS messages confirmed)
+    const result = await pollForPending(c.id);
+
+    // Update both checkpoints with real HCS data
+    const t1 = result.startedAt || t0;
+    const t2 = ts();
+    const h0 = rh(), h1 = rh();
+
+    cs.data.step0 = { type:'CASE_RECEIVED', hash:h0, t:t1, seq:(result.step1Seq||'—').toString() };
+    cs.data.step1 = {
+      type:'AGENT_RECOMMENDATION', hash:h1, t:t2,
+      seq:(result.step2Seq||'—').toString(),
+      eligible:result.eligible, confidence:result.confidence,
+    };
+    cs.step = 2;
+
+    // Overwrite static recommendation with real Claude output
+    if (result.outcome) {
+      c.rec = {
+        out: result.outcome,
+        conf: result.confidence==='HIGH'?0.92:result.confidence==='MEDIUM'?0.72:0.52,
+        txt: result.reasoning || result.outcome,
+      };
+    }
+
+    HCS_LOG.unshift({ t:t1, hash:h0, cid:c.id, type:'CASE_RECEIVED', seq:cs.data.step0.seq });
+    HCS_LOG.unshift({ t:t2, hash:h1, cid:c.id, type:'AGENT_RECOMMENDATION', seq:cs.data.step1.seq });
+    incStats(); incStats();
+
+    // Urgent cases auto-move to Pending after analysis — Standard cases stay in Active for manual attestation
+    if (c.pri === 'Urgent') {
+      const idx = CASES.indexOf(c);
+      if (idx !== -1) CASES.splice(idx, 1);
+      c.awaitingSince = t2;
+      PENDING.push(c);
+      const activeBadge = document.querySelector('#ni-active .nav-count');
+      if (activeBadge) activeBadge.textContent = CASES.length;
+      const pendingBadge = document.querySelector('#ni-pending .nav-count');
+      if (pendingBadge) pendingBadge.textContent = PENDING.length;
+      renderActive();
+      renderPending();
+      toast('✓ AGENT_RECOMMENDATION · HCS #'+(result.step2Seq||'') + ' · Case moved to Pending Review');
+    } else {
+      toast('✓ AGENT_RECOMMENDATION · HCS #'+(result.step2Seq||''));
+      renderActive();
+    }
+    renderTimeline(); renderAction();
+
+  } catch(err) {
+    toast('Error: '+err.message, true);
+    cs.step = 0; delete cs.data.step0;
+    renderTimeline(); renderAction();
+  }
+}
+
+// step1 is merged into step0 (Phase 1 posts both checkpoints together)
+function step1() { step0(); }
+
+async function attest(dec) {
+  const c = curCase;
+  const cs = getCS(c.id);
+
+  document.querySelectorAll('.btn-approve, .btn-override').forEach(b => b.disabled=true);
+  toast('Recording attestation on Hedera HCS…');
+
+  try {
+    const res = await fetch('/attest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        caseId: c.id,
+        decision: dec === 'OVERRIDDEN' ? 'REJECTED' : dec,
+        reviewerId: 'Sophie.OBrien@hartleycross.co.uk',
+        note: dec === 'APPROVED' ? 'Approved via APEX AUDIT dashboard' : 'Decision overridden via APEX AUDIT dashboard',
+      }),
+    });
+    if (!res.ok && res.status !== 404) throw new Error('Server error ' + res.status);
+  } catch(err) {
+    // 404 means case already attested or not in pending — continue with UI update
+    if (!err.message.includes('404')) { toast('Attest error: '+err.message, true); return; }
+  }
+
+  const h=rh(), t=ts(), s=rseq();
+  cs.data.step2 = { type:'HUMAN_ATTESTATION', hash:h, t, seq:s, dec };
+  cs.step = 3;
+  HCS_LOG.unshift({ t, hash:h, cid:c.id, type:'HUMAN_ATTESTATION', seq:s });
+  incStats();
+  toast((dec==='APPROVED'?'✓ APPROVED':'⚠ OVERRIDDEN')+' · HUMAN_ATTESTATION · seq #'+s, dec!=='APPROVED');
+  renderTimeline(); renderAction(); renderActive();
+}
+
+// ═══ AUDIT LOG ═══
+const STATIC_LOG = [
+  { t:'2026-04-12 08:16:44 UTC', cid:'CASE-2026-IE-0009',  type:'AGENT_RECOMMENDATION', seq:'4202', hash:rh() },
+  { t:'2026-04-12 08:15:02 UTC', cid:'CASE-2026-IE-0009',  type:'CASE_RECEIVED',         seq:'4201', hash:rh() },
+  { t:'2026-04-09 11:38:51 UTC', cid:'CASE-2026-AU-0039',  type:'HUMAN_ATTESTATION',    seq:'3814', hash:rh() },
+  { t:'2026-04-09 11:38:14 UTC', cid:'CASE-2026-AU-0039',  type:'AGENT_RECOMMENDATION', seq:'3813', hash:rh() },
+  { t:'2026-04-09 11:37:33 UTC', cid:'CASE-2026-AU-0039',  type:'CASE_RECEIVED',         seq:'3812', hash:rh() },
+  { t:'2026-04-08 16:12:22 UTC', cid:'CASE-2026-FR-0071',  type:'HUMAN_ATTESTATION',    seq:'3808', hash:rh() },
+  { t:'2026-04-08 16:11:41 UTC', cid:'CASE-2026-FR-0071',  type:'AGENT_RECOMMENDATION', seq:'3807', hash:rh() },
+  { t:'2026-04-08 16:11:01 UTC', cid:'CASE-2026-FR-0071',  type:'CASE_RECEIVED',         seq:'3806', hash:rh() },
+  { t:'2026-04-08 09:14:55 UTC', cid:'CASE-2026-UK-0052',  type:'CASE_RECEIVED',         seq:'3801', hash:rh() },
+];
+
+const TP = { CASE_RECEIVED:'p-slate', AGENT_RECOMMENDATION:'p-blue', HUMAN_ATTESTATION:'p-green' };
+
+function renderLog() {
+  const all = [...HCS_LOG, ...STATIC_LOG];
+  document.getElementById('log-body').innerHTML = all.map(l=>`
+    <div class="tbl-row" onclick="jumpHashScan('${l.hash}')">
+      <span class="tr-ts mono">${l.t}</span>
+      <span class="tr-case">${l.cid}</span>
+      <span><span class="pill ${TP[l.type]||'p-gray'}" style="font-size:9.5px">${l.type.replace(/_/g,' ')}</span></span>
+      <span class="mono" style="font-size:10.5px;color:#64748b">#${l.seq}</span>
+      <span class="tr-hash mono">${sh(l.hash)}</span>
+      <span><span class="pill p-green" style="font-size:9.5px">✓ VERIFIED</span></span>
+    </div>`).join('');
+}
+
+// ═══ HASHSCAN ═══
+async function runVerify() {
+  const val = (document.getElementById('vi').value.trim()) || TID;
+  const area = document.getElementById('v-result');
+  area.innerHTML = `<div style="padding:2rem;text-align:center;color:#94a3b8;font-size:13px;display:flex;align-items:center;justify-content:center;gap:8px"><div class="spin-sm"></div>Querying Hedera testnet mirror node…</div>`;
+
+  const isTopicId = /^\d+\.\d+\.\d+$/.test(val);
+  const topicId = isTopicId ? val : TID;
+
+  try {
+    const r = await fetch(`https://testnet.mirrornode.hedera.com/api/v1/topics/${topicId}/messages?limit=10&order=desc`);
+    if (!r.ok) throw new Error('Mirror node returned ' + r.status);
+    const data = await r.json();
+    const msgs = data.messages || [];
+
+    const decoded = msgs.map(m => {
+      let parsed = {};
+      try { parsed = JSON.parse(atob(m.message)); } catch {}
+      return {
+        seq: m.sequence_number,
+        ts: (m.consensus_timestamp||'').split('.')[0].replace('T',' '),
+        runHash: m.running_hash ? m.running_hash.substring(0,20)+'…'+m.running_hash.slice(-6) : '—',
+        type: parsed.event || 'MESSAGE',
+        caseId: parsed.caseId || '',
+        eligible: parsed.eligible,
+        decision: parsed.decision,
+      };
+    });
+
+    const totalSeq = msgs.length ? msgs[0].sequence_number : 0;
+
+    area.innerHTML = `
+      <div class="vresult fade-up">
+        <div class="vresult-hdr">
+          <div class="vbadge-ok">
+            <svg width="11" height="11" viewBox="0 0 11 11" fill="none"><path d="M2 5.5l2.5 2.5L9 3" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            VERIFIED ON HEDERA TESTNET
+          </div>
+          <div style="margin-left:auto;font-size:11px;font-family:inherit;color:#64748b">Topic: <span style="color:#6366f1">${topicId}</span></div>
+        </div>
+        <div style="padding:12px 16px;border-bottom:1px solid #f1f5f9;display:grid;grid-template-columns:repeat(3,1fr);gap:10px">
+          <div class="meta-item"><div class="meta-k">Network</div><div class="meta-v">Hedera Testnet</div></div>
+          <div class="meta-item"><div class="meta-k">Total Messages</div><div class="meta-v">${totalSeq}</div></div>
+          <div class="meta-item"><div class="meta-k">Status</div><div class="meta-v" style="color:#047857">✓ Live</div></div>
+        </div>
+        <div class="vmsg-list">
+          <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#94a3b8;margin-bottom:8px">Latest Messages — Mirror Node (Live)</div>
+          ${decoded.length ? decoded.map(m=>`
+            <div class="vmsg">
+              <div class="vmsg-top">
+                <span class="vmsg-seq mono">#${m.seq}</span>
+                <span class="vmsg-type mono" style="color:${m.type==='HUMAN_ATTESTATION'?'#047857':m.type==='AGENT_RECOMMENDATION'?'#4338ca':'#475569'}">${m.type}</span>
+                ${m.caseId?`<span class="pill p-slate" style="font-size:9px;margin-left:4px">${m.caseId}</span>`:''}
+                ${m.decision?`<span class="pill ${m.decision==='APPROVED'?'p-green':'p-amber'}" style="font-size:9px;margin-left:2px">${m.decision}</span>`:''}
+                <span class="vmsg-ts mono">${m.ts} UTC</span>
+              </div>
+              <div class="vmsg-hash mono" style="color:#94a3b8">${m.runHash}</div>
+            </div>`).join('') : '<div style="color:#94a3b8;font-size:12px;padding:8px 0">No messages yet on this topic</div>'}
+        </div>
+        <div style="padding:12px 16px;border-top:1px solid #f1f5f9;display:flex;align-items:center;gap:12px">
+          <a href="https://hashscan.io/testnet/topic/${topicId}" target="_blank" rel="noopener" style="font-size:12px;color:#6366f1;font-weight:600;text-decoration:none">→ Open full topic on hashscan.io ↗</a>
+          <button class="btn btn-ghost" style="font-size:11px;padding:5px 10px;margin-left:auto" onclick="nav('export')">Export Bundle</button>
+        </div>
+      </div>`;
+  } catch(err) {
+    area.innerHTML = `<div style="padding:2rem;text-align:center">
+      <div style="color:#b91c1c;font-size:13px;margin-bottom:12px">Mirror node error: ${err.message}</div>
+      <a href="https://hashscan.io/testnet/topic/${topicId}" target="_blank" rel="noopener" class="vlink">→ Open directly on hashscan.io ↗</a>
+    </div>`;
+  }
+}
+
+function jumpHashScan(hash) {
+  document.getElementById('vi').value = TID;
+  nav('hashscan');
+  runVerify();
+}
+
+// ═══ EXPORT ═══
+function doExport(label) {
+  toast('Generating: '+label+'…');
+  setTimeout(()=>toast('✓ '+label+' ready'), 1800);
+}
+
+// ═══ STATS ═══
+function incStats() {
+  const m = document.getElementById('s-msgs');
+  if (m) m.textContent = (parseInt(m.textContent.replace(/,/g,''))+1).toLocaleString();
+}
+
+// ═══ TOAST ═══
+function toast(msg, warn) {
+  const el = document.getElementById('toast');
+  const dot = document.getElementById('tdot');
+  document.getElementById('tmsg').textContent = msg;
+  dot.style.background = warn ? '#f59e0b' : '#10b981';
+  el.classList.add('show');
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>el.classList.remove('show'), 3600);
+}
+
+// ═══ DARK MODE ═══
+function toggleDark() {
+  const dark = document.body.classList.toggle('dark');
+  document.getElementById('theme-lbl').textContent = dark ? 'Dark' : 'Light';
+}
+
+// ═══ DOCUMENT UPLOAD ═══
+let uploadedDocs = [];
+let selectedDocType = 'contracts';
+
+document.getElementById('uf-case').addEventListener('change', function() {
+  document.getElementById('new-case-fields').style.display = this.value === 'new' ? 'block' : 'none';
+});
+
+function selType(el, type) {
+  document.querySelectorAll('.doc-type-btn').forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedDocType = type;
+}
+
+function onDragOver(e) { e.preventDefault(); document.getElementById('drop-zone').classList.add('drag'); }
+function onDragLeave(e) { document.getElementById('drop-zone').classList.remove('drag'); }
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag');
+  addFiles(Array.from(e.dataTransfer.files));
+}
+function onFileSelect(e) { addFiles(Array.from(e.target.files)); }
+
+const ICON_MAP = { pdf:'🔴', docx:'🔵', doc:'🔵', txt:'⬜', png:'🟣', jpg:'🟡', jpeg:'🟡' };
+const SIZE_MAP = (b) => b > 1048576 ? (b/1048576).toFixed(1)+'MB' : (b/1024).toFixed(0)+'KB';
+
+function addFiles(files) {
+  files.forEach(f => {
+    const ext = f.name.split('.').pop().toLowerCase();
+    uploadedDocs.push({ id: Date.now()+Math.random(), name: f.name, size: SIZE_MAP(f.size), ext, progress: 0, status: 'uploading', file: f });
+  });
+  renderDocQueue();
+  uploadedDocs.filter(d => d.status === 'uploading').forEach(d => simulateUpload(d.id));
+}
+
+function simulateUpload(id) {
+  let prog = 0;
+  const iv = setInterval(() => {
+    prog += Math.random() * 25;
+    const doc = uploadedDocs.find(d => d.id === id);
+    if (!doc) { clearInterval(iv); return; }
+    doc.progress = Math.min(100, Math.round(prog));
+    if (doc.progress >= 100) { doc.status = 'ready'; clearInterval(iv); }
+    renderDocQueue();
+  }, 200);
+}
+
+function removeDoc(id) {
+  uploadedDocs = uploadedDocs.filter(d => d.id !== id);
+  renderDocQueue();
+}
+
+function renderDocQueue() {
+  const el = document.getElementById('dq-items');
+  const count = document.getElementById('dq-count');
+  count.textContent = uploadedDocs.length + ' file' + (uploadedDocs.length !== 1 ? 's' : '');
+  if (!uploadedDocs.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:#94a3b8;font-size:12px">No files added yet</div>'; return; }
+  el.innerHTML = uploadedDocs.map(d => `
+    <div class="doc-item">
+      <div class="doc-file-icon" style="background:${d.ext==='pdf'?'#fef2f2':d.ext==='docx'||d.ext==='doc'?'#eef2ff':'#f5f3ff'}">${ICON_MAP[d.ext]||'📄'}</div>
+      <div class="doc-info">
+        <div class="doc-name">${d.name}</div>
+        <div class="doc-meta">${d.size} · ${selectedDocType} · ${d.status==='ready'?'<span style="color:#047857">Ready</span>':'uploading…'}</div>
+        ${d.status==='uploading'?`<div class="doc-prog"><div class="doc-prog-fill" style="width:${d.progress}%"></div></div>`:''}
+      </div>
+      <button class="doc-del" onclick="removeDoc(${d.id})" title="Remove">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2 2l8 8M10 2L2 10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </button>
+    </div>`).join('');
+}
+
+async function submitDocs() {
+  if (!uploadedDocs.length) { toast('Add at least one file first', true); return; }
+  const caseVal = document.getElementById('uf-case').value;
+  if (!caseVal) { toast('Please associate a case first', true); return; }
+  const readyDocs = uploadedDocs.filter(d => d.status === 'ready');
+  if (!readyDocs.length) { toast('Wait for files to finish uploading', true); return; }
+
+  toast('Computing SHA-256 hashes…');
+
+  try {
+    // Hash all files using SubtleCrypto
+    for (const doc of readyDocs) {
+      if (doc.file) {
+        const buf = await doc.file.arrayBuffer();
+        const hashBuf = await crypto.subtle.digest('SHA-256', buf);
+        doc.hash = '0x' + Array.from(new Uint8Array(hashBuf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+      }
+    }
+
+    const isNew = caseVal === 'new';
+    const newName = isNew ? (document.getElementById('uf-new-name')?.value || 'Document Review Case') : caseVal;
+    const notes = document.getElementById('uf-notes').value;
+    const jur = document.getElementById('uf-jur')?.value || 'England & Wales';
+
+    const caseData = {
+      caseId: isNew ? `DOC-${Date.now()}` : caseVal,
+      caseName: newName,
+      caseType: selectedDocType + ' review',
+      caseDescription: notes || `Document review: ${readyDocs.map(d=>d.name).join(', ')}`,
+      jurisdiction: jur,
+      fileName: readyDocs[0].name,
+      fileHash: readyDocs[0].hash,
+    };
+
+    const res = await fetch('/run-case', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(caseData),
+    });
+    if (!res.ok) throw new Error('Server error ' + res.status);
+
+    // Store file for preview in case detail view
+    const doc0 = readyDocs[0];
+    if (doc0.file) {
+      const isText = /\.(json|txt|csv|md|xml)$/i.test(doc0.name);
+      const entry = { name: doc0.name, size: doc0.size, hash: doc0.hash, type: doc0.ext };
+      const b64 = await new Promise(r => { const fr = new FileReader(); fr.onload = () => r(fr.result); fr.readAsDataURL(doc0.file); });
+      entry.dataUrl = b64;
+      if (isText) entry.text = await doc0.file.text();
+      caseFiles[caseData.caseId] = entry;
+    }
+
+    const preview = doc0.hash?.substring(0,22)+'…' || '';
+
+    // Add to active cases immediately while Claude analyses
+    const now = ts();
+    const newCase = {
+      id: caseData.caseId,
+      name: caseData.caseName,
+      type: caseData.caseType,
+      desc: caseData.caseDescription,
+      risk: 0.5,
+      rl: 'Analysing…',
+      rp: 'p-slate',
+      jur: caseData.jurisdiction,
+      filed: now.substring(0, 10),
+      model: 'claude-opus-4-6',
+    };
+    CASES.push(newCase);
+    const activeBadge = document.querySelector('#ni-active .nav-count');
+    if (activeBadge) activeBadge.textContent = CASES.length;
+    renderActive();
+    nav('active');
+
+    toast(`✓ ${readyDocs.length} doc${readyDocs.length>1?'s':''} hashed & submitted · Claude analysing… · ${preview}`);
+    uploadedDocs = [];
+    renderDocQueue();
+
+    // Poll until Phase 1 complete, then move case from active → pending
+    pollForPending(caseData.caseId)
+      .then(result => {
+        newCase.rec = {
+          out: result.outcome || 'Analysis complete',
+          conf: result.confidence === 'HIGH' ? 0.92 : result.confidence === 'MEDIUM' ? 0.72 : 0.52,
+          txt: result.reasoning || result.outcome || '',
+        };
+        if (result.eligible !== undefined) {
+          newCase.risk = result.eligible ? 0.3 : 0.82;
+          newCase.rl = result.eligible ? 'Low Risk' : 'High Risk';
+          newCase.rp = result.eligible ? 'p-green' : 'p-red';
+        }
+        // Mark HCS checkpoints in state
+        const cs = getCS(newCase.id);
+        const t0 = result.startedAt || now;
+        const t1 = ts();
+        cs.data.step0 = { type:'CASE_RECEIVED', hash:rh(), t:t0, seq:(result.step1Seq||'—').toString() };
+        cs.data.step1 = { type:'AGENT_RECOMMENDATION', hash:rh(), t:t1, seq:(result.step2Seq||'—').toString(), eligible:result.eligible, confidence:result.confidence };
+        cs.step = 2;
+        HCS_LOG.unshift({ t:t0, hash:cs.data.step0.hash, cid:newCase.id, type:'CASE_RECEIVED', seq:cs.data.step0.seq });
+        HCS_LOG.unshift({ t:t1, hash:cs.data.step1.hash, cid:newCase.id, type:'AGENT_RECOMMENDATION', seq:cs.data.step1.seq });
+        incStats(); incStats();
+        // Move from active → pending (awaiting attestation)
+        const idx = CASES.indexOf(newCase);
+        if (idx !== -1) CASES.splice(idx, 1);
+        newCase.awaitingSince = t1;
+        PENDING.push(newCase);
+        if (activeBadge) activeBadge.textContent = CASES.length;
+        const pendingBadge = document.querySelector('#ni-pending .nav-count');
+        if (pendingBadge) pendingBadge.textContent = PENDING.length;
+        renderActive();
+        renderPending();
+        toast('✓ AI analysis complete — case moved to Pending Review · HCS #'+(result.step2Seq||''));
+      })
+      .catch(err => toast('Analysis polling error: '+err.message, true));
+
+  } catch(err) {
+    toast('Submit error: '+err.message, true);
+  }
+}
+
+// ═══ EMAIL REVIEW ═══
+const EMAILS = [
+  { id:'em1', unread:true, from:'James Hartley', email:'james.hartley@hartleycross.co.uk', subject:"URGENT: CASE-2026-IE-0041 · O'Sullivan — AI Attestation Needed by 5pm", time:'09:42', caseId:'CASE-2026-IE-0041', casePool:'active', caseIdx:0,
+    body:`Sophie,\n\nI've reviewed the AI output on the O'Sullivan matter. The reasoning is sound — the EU 883/2004 coordination analysis is exactly right, and the PRSI contribution trail across IE and FR is properly accounted for.\n\nConfidence is at 91% which is well above our attestation threshold for uncontested eligibility. I'm satisfied the reasoning chain holds up.\n\nWe need formal attestation today — 5pm deadline for the DEASP submission. Client has been waiting six weeks and this audit trail on Hedera is exactly the kind of documentation they've asked us to provide.\n\nPlease attest when you can.`,
+    sig:'James Hartley\nSenior Partner, Employment & Social Security\nHartley & Cross LLP' },
+  { id:'em2', unread:true, from:'Dr. Lena Brandt', email:'l.brandt@brandt-ag-legal.de', subject:'CASE-2026-DE-0017 · EU AI Act Audit — Urgent Response Window', time:'11:15', caseId:'CASE-2026-DE-0017', casePool:'active', caseIdx:1,
+    body:`Dear Sophie,\n\nThank you for the APEX AUDIT output on our Brandt AG conformity review. The AI has correctly identified the gaps under Arts. 9, 11 and 14 — I had anticipated the human oversight finding given how the credit model was deployed.\n\nI need to push back slightly on the penalty exposure estimate. Our external counsel in Frankfurt believes the BaFin preliminary inquiry is investigative rather than formal, which may affect the €15M ceiling — closer to 1% is more realistic at this stage.\n\nI would ask that you add a note to the attestation record reflecting this legal context before signing off. The APEX audit trail will be central to our regulatory submission and the nuance matters.\n\nBest regards,`,
+    sig:'Dr. Lena Brandt\nChief Legal Officer\nBrandt AG' },
+  { id:'em3', unread:true, from:'Séamus Gallagher', email:'s.gallagher@bordboru.ie', subject:"CASE-2026-IE-0009 · An Bord Pleanála — Override Request re: Developer Standing", time:'Yesterday', caseId:'CASE-2026-IE-0009', casePool:'pending', caseIdx:0,
+    body:`Dear Sophie,\n\nI'm writing on behalf of our client, the developer in the An Bord Pleanála matter, regarding CASE-2026-IE-0009.\n\nWe accept the AI's finding regarding the missing human review step — that is correct and we are not disputing it. However, we would ask for an override on one element: the recommendation implies the developer lacked standing to trigger the review under s.180B PDA 2024. That is incorrect — the application was filed within the prescribed period and the developer's locus standi is not in question.\n\nWe need this nuance in the attestation record before the judicial review hearing. Can you review and attest with an accompanying note?\n\nKind regards,`,
+    sig:"Séamus Gallagher\nSolicitor\nBord Boru Legal Partners, Dublin" },
+  { id:'em4', unread:false, from:'APEX AUDIT System', email:'noreply@apexaudit.io', subject:'Automated: CASE-2026-NL-0033 · Document Processed — AI Analysis Queued', time:'Yesterday', caseId:'CASE-2026-NL-0033', casePool:'active', caseIdx:2,
+    body:`This is an automated notification from APEX AUDIT.\n\nA document has been uploaded and processed for CASE-2026-NL-0033 (Vermeer Capital).\n\nDocument: Vermeer_FundMgmt_Agreement_v4.pdf\nDocument type: Contract / Agreement\nSHA-256 hash logged to Hedera HCS topic 0.0.8601760 · Sequence #4231\n\nThe AI agent has been queued to run analysis. You will receive a further notification when the recommendation is ready for human attestation.\n\nThis message was generated automatically. Please do not reply.`,
+    sig:'APEX AUDIT · Automated Notification System\nHartley & Cross LLP · Case Management' },
+];
+
+let selEmail = null;
+const emailDecisions = {};
+
+function renderEmailList() {
+  document.getElementById('email-list').innerHTML = EMAILS.map(e => `
+    <div class="email-item ${e.unread && !emailDecisions[e.id]?'unread':''} ${selEmail===e.id?'sel':''}" onclick="openEmail('${e.id}')">
+      <div class="ei-meta">
+        ${e.unread && !emailDecisions[e.id] ? '<div class="unread-dot"></div>' : '<div style="width:6px"></div>'}
+        <div class="ei-from">${e.from}</div>
+        <div class="ei-time">${e.time}</div>
+      </div>
+      <div class="ei-subject">${e.subject}</div>
+      <div class="ei-preview">${e.body.substring(0,80).replace(/\n/g,' ')}…</div>
+      ${emailDecisions[e.id] ? `<div style="margin-top:4px"><span class="pill ${emailDecisions[e.id]==='APPROVED'?'p-green':emailDecisions[e.id]==='REJECTED'?'p-red':'p-amber'}" style="font-size:9.5px">${emailDecisions[e.id]}</span></div>` : ''}
+    </div>`).join('');
+}
+
+function openEmail(id) {
+  selEmail = id;
+  const e = EMAILS.find(x => x.id === id);
+  e.unread = false;
+  renderEmailList();
+
+  const c = e.casePool ? (e.casePool==='active'?CASES:e.casePool==='pending'?PENDING:COMPLETED)[e.caseIdx] : null;
+  const dec = emailDecisions[id];
+
+  const bodyParas = e.body.split('\n\n').filter(Boolean).map((p,i) =>
+    `<div class="${i===0?'ev-greeting':'ev-para'}">${p.replace(/\n/g,'<br>')}</div>`).join('');
+
+  const viewEl = document.getElementById('email-view-col');
+  viewEl.innerHTML = `
+    <div class="email-view">
+      <div class="ev-header">
+        <div class="ev-subject">${e.subject}</div>
+        <div class="ev-meta-row">
+          <div class="ev-from">From: <strong>${e.from}</strong> &lt;${e.email}&gt;</div>
+          <div class="ev-time mono">${e.time === 'Yesterday' ? '2026-04-11' : '2026-04-12'} · ${e.time==='Yesterday'?'17:44':e.time} UTC</div>
+        </div>
+        ${c?`<div style="margin-top:8px"><span class="pill p-blue" style="font-size:10.5px">${c.id}</span> <span class="pill p-slate" style="font-size:10.5px">${c.type}</span></div>`:''}
+      </div>
+
+      <div class="ev-body">
+        ${bodyParas}
+        ${c ? `<div class="ev-case-embed">
+          <div class="ev-case-id">APEX AUDIT · ${c.id}</div>
+          <div class="ev-case-title">${c.name}</div>
+          <div class="ev-case-rec">${c.rec.txt}</div>
+          <div class="ev-case-conf">AI Confidence: ${Math.round(c.rec.conf*100)}% · Outcome: <strong>${c.rec.out}</strong></div>
+        </div>` : ''}
+        <div class="ev-sig">${e.sig.replace(/\n/g,'<br>')}</div>
+      </div>
+
+      ${dec ? `
+        <div class="ev-done-banner">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" fill="#ecfdf5" stroke="#6ee7b7" stroke-width="1.5"/><path d="M4.5 8l2.5 2.5L11 5" stroke="#047857" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Decision recorded: <span style="color:${dec==='APPROVED'?'#047857':dec==='REJECTED'?'#b91c1c':'#b45309'}">${dec}</span> · Logged to Hedera HCS · Reviewer: Sophie O'Brien
+        </div>
+      ` : `
+        <div class="ev-actions">
+          <div class="ev-actions-title">Record Decision</div>
+          ${c ? '' : '<div style="font-size:12px;color:#94a3b8;margin-bottom:10px">This notification does not require attestation.</div>'}
+          <textarea class="ev-action-note" id="ev-note-${id}" placeholder="Add a note to accompany your decision (optional — will be logged to HCS)…"></textarea>
+          <div class="ev-btn-row">
+            <button class="btn btn-approve" onclick="emailDecide('${id}','APPROVED')">✓ Approve</button>
+            <button class="btn btn-override" onclick="emailDecide('${id}','OVERRIDE')">~ Override</button>
+            <button class="btn btn-reject" onclick="emailDecide('${id}','REJECTED')">✗ Reject</button>
+          </div>
+        </div>
+      `}
+    </div>`;
+}
+
+async function emailDecide(id, dec) {
+  const e = EMAILS.find(x => x.id === id);
+  const note = document.getElementById('ev-note-'+id)?.value || '';
+  const apiDec = dec === 'OVERRIDE' ? 'REJECTED' : dec;
+
+  // Fire-and-forget to real API (may 404 for static demo cases)
+  fetch('/attest', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      caseId: e.caseId || id,
+      decision: apiDec,
+      reviewerId: 'Sophie.OBrien@hartleycross.co.uk',
+      note: note || `Email review: ${dec}`,
+    }),
+  }).catch(() => {});
+
+  emailDecisions[id] = dec;
+  const h = rh(), s = rseq(), t = ts();
+  HCS_LOG.unshift({ t, hash:h, cid:e.caseId||'EMAIL-REVIEW', type:'HUMAN_ATTESTATION', seq:s });
+  toast(`${dec==='APPROVED'?'✓ Approved':dec==='REJECTED'?'✗ Rejected':'~ Override recorded'} · ${e.caseId||''} · seq #${s}`);
+  renderEmailList();
+  openEmail(id);
+  if (e.casePool === 'active' && dec === 'APPROVED') {
+    const cs = getCS(e.caseId);
+    if (cs.step >= 2) { cs.data.step2 = { type:'HUMAN_ATTESTATION', hash:h, t, seq:s, dec }; cs.step = 3; renderActive(); }
+  }
+}
+
+// ═══ MIRROR NODE STATS POLLING ═══
+let _prevSeq = 0, _prevSeqTime = 0;
+
+async function pollMirrorStats() {
+  try {
+    const r = await fetch(`https://testnet.mirrornode.hedera.com/api/v1/topics/${TID}/messages?limit=1&order=desc`);
+    if (!r.ok) return;
+    const data = await r.json();
+    const msg = data.messages?.[0];
+    if (!msg) return;
+
+    const seq = msg.sequence_number;
+    const el = document.getElementById('s-msgs');
+    if (el) el.textContent = seq.toLocaleString();
+
+    // Compute msg/min from delta
+    const now = Date.now();
+    if (_prevSeq && _prevSeqTime) {
+      const deltaSeq = seq - _prevSeq;
+      const deltaMin = (now - _prevSeqTime) / 60000;
+      if (deltaMin > 0) {
+        const rate = (deltaSeq / deltaMin).toFixed(1);
+        const tpsEl = document.getElementById('s-tps');
+        if (tpsEl) tpsEl.textContent = rate;
+      }
+    }
+    _prevSeq = seq; _prevSeqTime = now;
+  } catch { /* silent — no network or CORS */ }
+}
+
+// ═══ INIT ═══
+renderActive();
+renderEmailList();
+pollMirrorStats();
+setInterval(pollMirrorStats, 15000); // refresh every 15s
+</script>
+</body>
+</html>

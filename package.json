@@ -1,0 +1,23 @@
+{
+  "name": "apex",
+  "version": "0.1.0",
+  "description": "Agent Prediction Exchange — agent-to-agent prediction markets on Hedera",
+  "type": "module",
+  "main": "src/main.js",
+  "scripts": {
+    "start": "node server.js",
+    "mcp": "node src/mcp-server.js",
+    "create-topics": "node scripts/createTopics.js",
+    "demo": "node scripts/runDemo.js",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.40.0",
+    "@hashgraph/sdk": "^2.81.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "dotenv": "^16.4.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
