@@ -1,97 +1,185 @@
-# APEX AUDIT — Hackathon PRD
-> Immutable AI Agent Audit Trail for Legal Services, built on Hedera Consensus Service
+# APEX AUDIT — Product Requirements Document
+> Immutable AI Decision Audit Infrastructure · Built on Hedera · LLM-Agnostic via MCP
 
-**Deadline:** 10am today (April 11, 2026) · **Build budget:** ~4 hours
+**Version:** 2.0 — Post-Build PRD  
+**Date:** April 2026  
+**Stage:** MVP Delivered → Pre-Seed Fundraise
 
 ---
 
 ## 1. Problem Statement
 
-In August 2026 the EU AI Act comes into force. Legal services is explicitly classified as **high-risk AI**. Every AI agent decision touching case assessment, benefits eligibility, contract review, or legal advice must produce a verifiable audit trail. Penalties reach €35 million or 7% of global revenue.
+### The Regulatory Forcing Function
 
-The majority of law firms, government legal departments, and legal AI platforms have **no compliant audit infrastructure**. Worse — there is no infrastructure they *could* use even if they wanted to. AI agent decisions are unattributable: the input received, the reasoning applied, and the output produced disappear when the context window closes.
+In August 2026, the EU AI Act comes into full enforcement. Legal services, credit scoring, hiring, benefits decisions, and medical triage are all classified as **high-risk AI**. Every automated decision must produce a verifiable, tamper-proof audit trail with human oversight documentation. Penalties reach **€35 million or 7% of global revenue**.
 
-**Target Users:** Legal AI platform vendors, law firms deploying AI caseworkers, government legal departments, compliance officers.
+**The infrastructure gap is total.** There is no compliant audit trail product available today — not because nobody thought of it, but because the requirements are structurally unsatisfiable by centralised systems. A court or regulator asking "what did this AI decide, why, and who approved it?" needs an answer that cannot be altered by the operator. No database, no SaaS log, no PDF report can provide that.
 
-**Current Solutions:** Database audit logs (mutable, internal, not independently verifiable), PDF reports (not tamper-proof), enterprise logging SaaS (centralised — a court will ask "who controls the server?").
+### The AI Agent Accountability Crisis
 
-**Why Web3?** The defining property that no Web2 system can provide is **independent verifiability by a third party who trusts neither party**. A regulator, a court, or opposing counsel can independently verify the APEX AUDIT trail using only a topic ID and HashScan. No access to internal systems required. No trust in the operator required. This is structurally impossible with any centralised log.
+Beyond compliance, the broader AI industry has a trust problem. As AI agents make decisions at scale — legal judgements, financial recommendations, medical triage — there is no standard for attributing, verifying, or disputing those decisions after the fact. The input disappears. The reasoning disappears. The approval record exists only in whoever's database they control.
+
+### Target Users
+
+| Segment | Pain | Urgency |
+|---------|------|---------|
+| Legal AI SaaS vendors | Must provide audit trail to clients before Aug 2026 | Critical |
+| Law firms deploying AI caseworkers | Liability exposure without verified decision records | High |
+| Government legal departments | Parliamentary / FOI accountability requirements | High |
+| AI compliance officers | No tooling exists to satisfy Art. 14/17 requirements | Critical |
+| Any enterprise deploying high-risk AI | Same EU AI Act requirements apply across sectors | Medium–High |
 
 ---
 
 ## 2. Solution Overview
 
-APEX AUDIT intercepts the AI agent workflow at three precisely-defined checkpoints and posts a structured JSON message to a Hedera HCS topic at each point. The messages are immutably timestamped and globally sequenced by Hedera network consensus — not by any server APEX controls.
+APEX AUDIT is **AI decision audit infrastructure** — not a legal tool, not an AI model, not a compliance SaaS dashboard. It is the layer that sits between any AI agent and the permanent record of what that agent decided.
 
-**The three checkpoints:**
+### The Three-Checkpoint Audit Trail
 
-1. `CASE_RECEIVED` — agent receives input; SHA-256 hash of the case data logged on-chain
-2. `AGENT_RECOMMENDATION` — Claude produces its recommendation; reasoning summary and outcome logged
-3. `HUMAN_ATTESTATION` — human reviewer approves or overrides; reviewer ID and decision logged
+Every case processed through APEX AUDIT generates three immutable records on Hedera HCS:
 
-**The result:** A court-ready, publicly verifiable decision trail. Anyone with the topic ID can query HashScan and reproduce the full sequence independently.
+```
+CASE_RECEIVED          ──► SHA-256 hash of all input data locked on-chain
+AGENT_RECOMMENDATION   ──► Claude reasoning summary, outcome, confidence logged
+HUMAN_ATTESTATION      ──► Reviewer ID, decision (APPROVED/REJECTED), note logged
+```
 
-**Demo:** A synthetic Universal Credit (UK benefits) eligibility case. A Claude-powered caseworker agent assesses eligibility. Three HCS messages post in sequence. A live dashboard polls the Hedera mirror node and renders the trail in real time. Judges click a HashScan link and verify on-chain themselves.
+Each message is ordered, consensus-timestamped, and assigned a globally unique sequence number by the Hedera network — not by APEX AUDIT. The running hash across messages makes any gap or tampering mathematically detectable. This is the evidentiary standard courts require.
 
-**Hackathon Track Alignment:** AI + Compliance, Real-World Utility, Hedera Core Services.
+### What We Actually Built (MVP)
 
-### Key Features (MVP)
-1. **HCS Audit Logging** — three-stage decision trail written immutably to HCS
-2. **Claude Caseworker Agent** — real Anthropic API call producing structured eligibility recommendation
-3. **Live Dashboard** — vanilla HTML/JS polling the Hedera mirror node REST API every 3 seconds, no framework needed
-4. **HashScan Verification Link** — direct deep-link so judges can independently verify on-chain
+**`src/agent.js`** — Claude-powered legal caseworker that runs the full 3-checkpoint audit flow. Accepts any structured case data, calls `claude-opus-4-6`, posts results to HCS. Exports `runCasePhase1`, `runAttestation`, `runAuditedCase`.
 
-### Non-Goals (v1)
-- No HTS token transfers or staking
-- No authentication or wallet UI
-- No database or persistent storage
-- No real case data (synthetic demo only)
-- No multi-agent negotiation
-- No smart contracts
-- No production security hardening
+**`src/mcp-server.js`** — Model Context Protocol server exposing three tools:
+- `apex_log_case` — submit a case, get CASE_RECEIVED + AGENT_RECOMMENDATION on HCS
+- `apex_attest` — record human attestation, completing the Art. 14 chain
+- `apex_run_audit` — full automated 3-checkpoint flow in one call
+
+**`server.js`** — HTTP dashboard server with endpoints:
+- `POST /run-case` — trigger Phase 1 async, immediate 202 response
+- `POST /attest` — record Phase 2 attestation
+- `GET /pending` — list cases awaiting human review
+
+**`public/index.html`** — Full case management dashboard:
+- File upload with SHA-256 hashing in-browser (content never leaves client)
+- Active, Pending Review, and Completed case queues
+- Urgent case auto-processing (workflow triggers automatically on open)
+- Standard case manual trigger (reviewer controls timing)
+- Real-time HCS checkpoint timeline per case
+- HashScan deep-links on every confirmed checkpoint
+- Dark mode, case detail view, attestation panel
+
+**`src/hedera/`** — Hedera client singleton and HCS helpers (create, submit, subscribe, query)
+
+**`scripts/`** — One-time setup (`setup.js`), topic creation (`createTopics.js`), demo runner (`runDemo.js`)
+
+### The MCP Differentiator — LLM-Agnostic Audit Infrastructure
+
+This is the feature that separates APEX AUDIT from every other AI compliance tool announced for the EU AI Act.
+
+**Every other solution is locked to one LLM vendor.** They call OpenAI, or Anthropic, or Mistral, and wrap the output in their own logging format.
+
+APEX AUDIT's MCP server means **any MCP-compatible AI client can trigger a legally compliant, Hedera-verified audit trail without knowing anything about the underlying infrastructure.** Claude, GPT-4o, Gemini, Llama 3 via a local bridge — any of them can call `apex_log_case` and get the same immutable HCS record.
+
+This is not a minor technical detail. It means:
+- A firm running GPT-4o for contract review can use APEX AUDIT
+- A government department running a locally-hosted Llama model can use APEX AUDIT
+- A legal AI platform running five different models for different jurisdictions can use APEX AUDIT
+- **APEX AUDIT becomes the compliance layer for the entire AI ecosystem, not just one LLM's customers**
+
+The MCP protocol is becoming the standard tool interface for AI agents. Being compliant with it from day one means APEX AUDIT is infrastructure — like an API — not a SaaS product tied to one vendor's ecosystem.
 
 ---
 
 ## 3. Hedera Integration Architecture
 
-### Network Services Used
+### Network Services — Current (MVP)
 
-| Service | Purpose | Why This Service? |
-|---------|---------|-------------------|
-| **HCS (TopicCreateTransaction)** | Create the immutable audit topic | Ordered, consensus-timestamped messages — tamper-proof by network design, not by policy |
-| **HCS (TopicMessageSubmitTransaction)** | Post the 3 audit checkpoints | Each message gets a globally unique sequence number and running hash — mathematically verifiable |
-| **Mirror Node REST API** | Dashboard polling for live updates | Stateless, no SDK needed for reads; base64 message decode is 1 line of JS |
+| Service | How Used | Depth |
+|---------|----------|-------|
+| **HCS — TopicCreateTransaction** | Create immutable per-client audit topics with admin key | Core |
+| **HCS — TopicMessageSubmitTransaction** | Post the 3 structured JSON checkpoints per case | Core |
+| **HCS — TopicMessageQuery** | Subscribe to topic for real-time dashboard updates | Core |
+| **HCS — TopicInfoQuery** | Query topic state for dashboard meta | Supporting |
+| **Mirror Node REST API** | Dashboard polling for confirmed messages, sequence numbers | Supporting |
+| **HashScan** | Deep-link verification URL on every confirmed checkpoint | UX / Verification |
 
-### Ecosystem Integrations
+### Network Services — Roadmap (Phase 2: Agentic Commerce)
 
-| Platform | Integration | Value |
-|----------|-------------|-------|
-| **HashScan** | Direct link to topic message trail | Judges can independently verify without any APEX infrastructure — the killer demo moment |
+| Service | Purpose | Phase |
+|---------|---------|-------|
+| **HTS — TokenCreateTransaction** | Mint `AUDIT_CERT` NFT on completion of each 3-checkpoint trail | Phase 2 |
+| **HTS — TokenMintTransaction** | Issue compliance certificates as transferable on-chain assets | Phase 2 |
+| **HTS — Custom Fees** | Attach per-audit royalty fee to token transfers for revenue | Phase 2 |
+| **HBAR Micropayments** | Pay-per-audit billing — each `apex_run_audit` tool call settles in HBAR | Phase 2 |
+| **Scheduled Transactions** | Auto-escalate un-attested recommendations after configurable SLA | Phase 2 |
+| **Smart Contracts (EVM)** | Chainlink oracle integration for regulatory threshold feeds | Phase 3 |
 
-### Architecture
+### Ecosystem Integrations — Roadmap
+
+| Partner | Integration | Value |
+|---------|-------------|-------|
+| **HashPack** | Wallet connect for reviewer identity and HBAR payment signing | Reviewer authentication, payment UX |
+| **Chainlink** | Price feeds for HBAR/EUR billing, regulatory threshold data feeds | Reliable billing, automated compliance thresholds |
+| **SaucerSwap** | HBAR liquidity for agentic commerce settlement | Enables agents to acquire HBAR for audit payments autonomously |
+
+### Architecture — Current
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│                     APEX AUDIT FLOW                     │
-│                                                         │
-│  Case Input ──► agent.js ──► Claude API                 │
-│      │              │           │                       │
-│      │         [CASE_RECEIVED]  │                       │
-│      │              │     [AGENT_RECOMMENDATION]        │
-│      │              │           │                       │
-│  Human Review ──────────► [HUMAN_ATTESTATION]           │
-│                    │                                    │
-│                    ▼                                    │
-│           Hedera HCS Topic                              │
-│           (immutable, sequenced, timestamped)           │
-│                    │                                    │
-│                    ▼                                    │
-│        Mirror Node REST API                             │
-│                    │                                    │
-│                    ▼                                    │
-│        index.html Dashboard ◄── polls every 3s         │
-│        + HashScan deep-link                             │
-└─────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────┐
+│                       APEX AUDIT v1 FLOW                         │
+│                                                                  │
+│  ┌─────────────┐    MCP Tool Call      ┌──────────────────────┐  │
+│  │ Any LLM     │ ──────────────────►   │  src/mcp-server.js   │  │
+│  │ (Claude,    │   apex_log_case        │  (MCP stdio server)  │  │
+│  │  GPT-4o,    │   apex_attest          └──────────┬───────────┘  │
+│  │  Gemini,    │   apex_run_audit                  │              │
+│  │  Llama...)  │                                   ▼              │
+│  └─────────────┘                       ┌──────────────────────┐  │
+│                                        │    src/agent.js      │  │
+│  ┌─────────────┐    HTTP POST          │  (Claude caseworker) │  │
+│  │  Dashboard  │ ──────────────────►   │  + HCS checkpoints   │  │
+│  │  (browser)  │   /run-case           └──────────┬───────────┘  │
+│  │             │   /attest                        │              │
+│  │  File Upload│◄──────────────────               ▼              │
+│  │  Case Queue │   /pending            ┌──────────────────────┐  │
+│  │  Attestation│                       │   Hedera HCS Topic   │  │
+│  └─────────────┘                       │  CASE_RECEIVED #n    │  │
+│                                        │  AGENT_REC    #n+1   │  │
+│                                        │  HUMAN_ATTEST #n+2   │  │
+│                                        └──────────┬───────────┘  │
+│                                                   │              │
+│                                         Mirror Node + HashScan   │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+### Architecture — Phase 2: Agentic Commerce
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                   APEX AUDIT v2 — AGENTIC COMMERCE               │
+│                                                                  │
+│  AI Agent calls apex_run_audit via MCP                           │
+│        │                                                         │
+│        ▼                                                         │
+│  Smart Contract verifies HBAR payment (Chainlink price feed)     │
+│        │                                                         │
+│        ▼                                                         │
+│  3-checkpoint HCS audit trail written                            │
+│        │                                                         │
+│        ▼                                                         │
+│  HTS NFT minted → AUDIT_CERT token sent to client wallet         │
+│        │                                                         │
+│        ▼                                                         │
+│  HashPack: reviewer signs attestation with wallet identity       │
+│        │                                                         │
+│        ▼                                                         │
+│  Chainlink: regulatory threshold breach → auto-escalation        │
+│        │                                                         │
+│        ▼                                                         │
+│  SaucerSwap: agent acquires HBAR liquidity for next audit        │
+└──────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -99,175 +187,274 @@ APEX AUDIT intercepts the AI agent workflow at three precisely-defined checkpoin
 ## 4. Hedera Network Impact
 
 ### Account Creation
-- Every legal AI platform that deploys APEX AUDIT must create a Hedera operator account to write to HCS.
-- Target: 50 early-adopter platforms × 1–3 accounts each = **50–150 new accounts** in year 1.
 
-### Active Accounts
-- Each deployed instance posts 3 HCS messages per case processed.
-- A mid-size legal AI platform processes ~500 cases/month → 1,500 monthly HCS transactions per customer.
-- At 50 customers: **75,000 monthly HCS transactions → ~2,500 monthly active accounts** (operators + review agents).
+| Source | Accounts | Timeline |
+|--------|----------|----------|
+| Each legal AI platform deploying APEX AUDIT | 1–3 operator accounts | Year 1 |
+| Each enterprise customer with multi-client setup | 1 account per client shard | Year 1–2 |
+| Phase 2: each reviewer using HashPack identity | 1 account per human reviewer | Year 2 |
+| Phase 2: each autonomous AI agent billing in HBAR | 1 account per agent instance | Year 2–3 |
 
-### Transactions Per Second (TPS)
-- High-volume legal platforms (NHS, HMRC, large law firms) process thousands of cases daily.
-- UK Universal Credit alone processes ~400,000 decisions/month. A 0.1% market share = 400 cases/day = 1,200 daily HCS messages.
-- At scale (100 platforms): **~120,000 daily HCS transactions**.
+**Year 1 target:** 50 platforms × 2 accounts = **100–150 new Hedera accounts**  
+**Year 2 target (Phase 2):** +500 reviewer accounts + agent accounts = **650+ accounts**
 
-### Audience Exposure
-- **Target market:** 10,000+ law firms in the EU required to comply with the AI Act; 500+ legal AI SaaS platforms.
-- **New audience for Hedera:** Compliance officers, GovTech buyers, LegalTech VCs — none of whom are in the current Hedera ecosystem.
-- **TAM:** €2.1B EU AI Act compliance tooling market (2026–2030 projection).
+### Transaction Volume
+
+| Scenario | HCS Messages/Month | Notes |
+|----------|--------------------|-------|
+| 1 mid-size legal AI platform (500 cases/month) | 1,500 | 3 per case |
+| 10 platforms onboarded | 15,000 | — |
+| 50 platforms (Year 1 target) | 75,000 | — |
+| NHS / HMRC equivalent (400k decisions/month at 0.1% share) | 1,200/day | ~36,000/month |
+| Phase 2: HTS mint per completed audit | +1 per case | Additional TPS |
+
+**Year 1 steady state:** ~75,000–120,000 HCS messages/month across 50 customers.
+
+### New Audiences for Hedera
+
+APEX AUDIT brings three entirely new buyer categories to the Hedera ecosystem — none of whom are currently Hedera users:
+
+1. **GovTech procurement officers** — EU government AI compliance budgets are in the hundreds of millions
+2. **Legal AI SaaS CFOs** — signing 3-year compliance infrastructure contracts
+3. **EU AI Act compliance consultants** — recommending tooling stacks to hundreds of clients each
+4. **Enterprise AI teams** — deploying LLMs at scale outside the crypto/DeFi space
 
 ---
 
 ## 5. Innovation & Differentiation
 
-### Ecosystem Gap
-No project in the Hedera ecosystem today provides a compliance-grade AI decision audit trail. DeFi and tokenisation dominate. APEX AUDIT brings a completely new vertical — AI governance infrastructure — to Hedera.
+### What Doesn't Exist Yet
 
-### Cross-Chain Comparison
-- Ethereum/Polygon: audit log approaches exist but transaction fees and 12-second finality make per-decision logging economically unviable at scale. Hedera's ~$0.0001 per HCS message and 3-5 second finality make it the only viable choice.
-- Solana: fast, but no equivalent to HCS ordered message semantics. Mirror node + immutable sequence is uniquely Hedera.
-- No direct competitor exists on any chain today.
+No project in the Hedera ecosystem, and no project on any other blockchain, currently provides:
+- A **multi-LLM, MCP-native** audit trail
+- **Three-checkpoint AI decision logging** mapped explicitly to EU AI Act Art. 14 (human oversight) and Art. 17 (quality management)
+- A **file upload → hash → AI analysis → HCS log → attestation** end-to-end workflow
+
+### The MCP Moat
+
+The Model Context Protocol is emerging as the standard interface for AI tool use. Anthropic released it, but Google, Microsoft, and the open-source community are all converging on it. By building APEX AUDIT as an MCP server today:
+
+- Any AI assistant that supports MCP can call our tools with zero integration effort
+- We become **infrastructure**, not a point solution — the same positioning as Stripe (payment infrastructure) or Twilio (communication infrastructure)
+- No competitor can replicate this without rebuilding from scratch against a protocol that's already deployed
+
+### Why Hedera vs. Other Chains
+
+| Property | Hedera | Ethereum | Solana |
+|----------|--------|----------|--------|
+| Cost per HCS message | ~$0.0001 | ~$0.50–$5.00 | N/A (no equivalent) |
+| Finality | 3–5 seconds | 12–64 seconds | ~0.4s but probabilistic |
+| Ordered message semantics | ✓ Native HCS | ✗ | ✗ |
+| Running hash proof | ✓ Native HCS | ✗ | ✗ |
+| Legal evidence framing | ✓ Sequence + hash | Complex, expensive | Unsuitable |
+
+Hedera is the only viable choice for per-decision audit logging at scale. This is not a marketing claim — it is an economic fact. At $5 per Ethereum transaction, logging every AI decision is impossible for any real business.
 
 ### Novel Hedera Usage
-Using HCS not as a pub/sub event bus (its typical framing) but as a **legal evidence ledger** — where the running hash and sequence number are the proof of non-tampering cited in a compliance submission. This reframes HCS from developer infrastructure to court-admissible record-keeping.
+
+- **HCS as legal evidence ledger** — reframing the running hash and sequence number as court-admissible proof of non-tampering, not just a developer pub/sub mechanism
+- **MCP-to-HCS bridge** — first published implementation connecting the MCP tool protocol directly to HCS, making Hedera compliance infrastructure accessible to every LLM ecosystem
+- **Phase 2: Agentic commerce on Hedera** — AI agents autonomously paying for audit services in HBAR, acquiring liquidity via SaucerSwap, and settling compliance obligations without human payment intervention
 
 ---
 
 ## 6. Feasibility & Business Model
 
 ### Technical Feasibility
-- **Services Required:** HCS only — the simplest Hedera integration possible
-- **Team Capabilities:** Node.js, Anthropic SDK, REST APIs — standard modern web stack
-- **Technical Risks:** Mirror node latency (~3–5s), Anthropic API cold start
-- **Mitigation:** 3-second poll interval in dashboard absorbs mirror node delay; Claude API call is synchronous in the agent flow
 
-### Why Web3 is Required
-A centralised audit log answers the question "what does APEX AUDIT's database say happened?" A Hedera HCS trail answers the question "what does the Hedera network's consensus say happened?" — a fundamentally different evidentiary standard. Courts and regulators asking about AI system behaviour under the EU AI Act need the second answer, not the first. Only a distributed consensus network can provide it.
+| Component | Stack | Status |
+|-----------|-------|--------|
+| HCS audit logging | `@hashgraph/sdk` v2.81 | ✅ Built and tested |
+| Claude caseworker agent | `@anthropic-ai/sdk` v0.40 | ✅ Built and tested |
+| MCP server | `@modelcontextprotocol/sdk` v1.29 | ✅ Built and tested |
+| Dashboard + case management | Vanilla HTML/JS, no framework | ✅ Built and tested |
+| File upload + SHA-256 hashing | SubtleCrypto API (browser-native) | ✅ Built and tested |
+| Urgent/Standard case routing | Frontend state + polling | ✅ Built and tested |
 
-### Business Model (Lean Canvas)
+**Technical risks and mitigations:**
+
+| Risk | Mitigation |
+|------|-----------|
+| Mirror node latency (3–5s) | Poll interval absorbs delay; dashboard shows "Analysing…" state |
+| Claude API cold start | 202 async response pattern — user never blocks on API call |
+| MCP client compatibility | Tested against Claude Desktop; stdio transport is universal |
+| HEDERA_TOPIC_ID misconfiguration | `scripts/setup.js` auto-writes to .env |
+
+### Why Web3 is Structurally Required
+
+A centralised audit log answers: *"What does APEX AUDIT's database say happened?"*  
+A Hedera HCS trail answers: *"What does global network consensus say happened?"*
+
+These are different evidentiary standards. Courts and regulators enforcing the EU AI Act need the second answer. The EU AI Act's Art. 17 quality management requirement specifically contemplates records that cannot be altered by the operator — this is structurally impossible with any centralised system.
+
+### Business Model — Lean Canvas
 
 | Element | Description |
 |---------|-------------|
-| **Problem** | No EU AI Act-compliant audit infrastructure exists; AI decisions are unattributable; internal logs are inadmissible |
-| **Solution** | HCS-backed immutable audit trail; three-checkpoint agent interception; HashScan-verifiable |
-| **Key Metrics** | Cases audited/month, HCS messages written, compliance certifications issued, time-to-audit-report |
-| **Unique Value Prop** | "The only AI audit trail a court can verify without trusting you" |
-| **Unfair Advantage** | Hedera's $0.0001/message economics; regulatory deadline creating a forcing function; first-mover in legal AI compliance on Hedera |
-| **Channels** | LegalTech conferences (ILTACON, Legal Geek), direct outreach to GovTech AI vendors, EU AI Act compliance consultants |
-| **Customer Segments** | Legal AI SaaS platforms (primary), law firms with AI tools (secondary), government legal departments (tertiary) |
-| **Cost Structure** | Hedera HCS fees (~$0.0001/message), Anthropic API usage, hosting (~$50/month) |
-| **Revenue Streams** | SaaS per-audit pricing ($0.10–$1.00/case audited), compliance report export ($99/month), enterprise plans ($2,000–$10,000/month) |
+| **Problem** | No EU AI Act-compliant AI decision audit infrastructure exists; AI decisions are unattributable; internal logs are inadmissible as independent evidence |
+| **Solution** | MCP-native, LLM-agnostic audit trail on Hedera HCS; three-checkpoint Art. 14/17 workflow; HashScan-verifiable by any third party |
+| **Key Metrics** | Cases audited/month · HCS messages written · Compliance certs issued · MCP tool calls/month · HBAR payment volume (Phase 2) |
+| **Unique Value Prop** | "The only AI audit trail any court can verify — for any LLM, via MCP, at $0.0001 per decision" |
+| **Unfair Advantage** | MCP-native from day one · Hedera economics make per-decision logging viable · August 2026 deadline creates captive demand · First-mover in legal AI compliance on Hedera |
+| **Channels** | MCP tool registry · LegalTech conferences (ILTACON, Legal Geek) · EU AI Act compliance consultants · Direct outreach to legal AI SaaS vendors |
+| **Customer Segments** | Legal AI SaaS platforms (primary) · Enterprise AI compliance teams (secondary) · Government legal departments (tertiary) · Any MCP-compatible AI workflow (Phase 2) |
+| **Cost Structure** | Hedera HCS fees (~$0.0001/message) · Anthropic API usage · Hosting ($50–200/month) · Phase 2: smart contract deployment |
+| **Revenue Streams** | Per-audit pricing ($0.10–$1.00/case) · Compliance report export ($99/month) · Enterprise plan ($2,000–$10,000/month) · Phase 2: HBAR micropayments per MCP tool call |
 
 ---
 
 ## 7. Execution Plan
 
-### MVP Scope (Hackathon — 4 hours)
+### MVP — Delivered ✅
 
-| Feature | Priority | Effort | Hedera Service | File |
-|---------|----------|--------|----------------|------|
-| HCS topic creation | P0 | 20 min | HCS | `scripts/setup.js` |
-| Claude caseworker agent + 3 HCS posts | P0 | 90 min | HCS | `src/agent.js` |
-| Live mirror node dashboard | P0 | 60 min | Mirror Node REST | `public/index.html` |
-| Orchestrator / demo runner | P0 | 30 min | — | `scripts/runDemo.js` |
-| Test + fix | P0 | 40 min | — | — |
+| Feature | Status | Hedera Service |
+|---------|--------|----------------|
+| HCS topic creation + setup | ✅ | HCS |
+| Claude caseworker agent + 3 HCS checkpoints | ✅ | HCS |
+| MCP server (3 tools) | ✅ | HCS via agent.js |
+| Dashboard + case management UI | ✅ | Mirror Node |
+| File upload + in-browser SHA-256 hashing | ✅ | — |
+| Active / Pending / Completed case queues | ✅ | — |
+| Urgent auto-process, Standard manual trigger | ✅ | — |
+| HashScan deep-links per checkpoint | ✅ | HashScan |
+| Dark mode, responsive layout | ✅ | — |
+| Demo runner script | ✅ | — |
 
-### Build Order
+### Phase 2 Roadmap — Agentic Commerce (Months 1–6)
 
-```
-1. scripts/setup.js         (20 min) — create HCS topic, write HEDERA_TOPIC_ID to .env
-2. src/agent.js             (90 min) — Claude call + 3 sequential HCS posts
-3. public/index.html        (60 min) — vanilla JS polling mirror node, live table + HashScan link
-4. scripts/runDemo.js       (30 min) — orchestrate full flow with 3s pauses for demo effect
-5. End-to-end test + fix    (40 min)
-```
+| Feature | Hedera Service | Partner | Value |
+|---------|---------------|---------|-------|
+| `AUDIT_CERT` NFT mint on audit completion | HTS — TokenMint | — | Transferable compliance certificate; new asset class |
+| HBAR micropayment per audit | HBAR transfer | — | Pay-per-use billing without credit cards or subscriptions |
+| HashPack wallet connect for reviewer identity | HTS + HBAR | HashPack | Cryptographically verified reviewer identity on-chain |
+| Chainlink HBAR/EUR price feed | Smart Contract + Chainlink | Chainlink | Fixed-EUR billing settled in HBAR; no exchange rate risk for customers |
+| Chainlink regulatory threshold feeds | Smart Contract + Chainlink | Chainlink | Auto-trigger escalation when AI confidence drops below regulatory threshold |
+| SaucerSwap HBAR liquidity for agents | Smart Contract | SaucerSwap | AI agents acquire HBAR autonomously to pay for audits — fully agentic commerce |
+| Scheduled Transaction auto-escalation | Scheduled Transactions | — | Un-attested cases escalate automatically after configurable SLA |
+
+### Phase 3 Roadmap — Scale (Months 6–18)
+
+| Feature | Description |
+|---------|-------------|
+| SDK middleware: `apexAudit.wrap(agent)` | One-line integration wrapping any AI agent call with automatic audit trail |
+| Multi-topic architecture | Per-client or per-jurisdiction isolated topic namespaces |
+| Webhook integration | `POST /audit/wrap` for existing legal AI platforms with no code change |
+| HFS document anchoring | Full case documents stored on Hedera File Service, referenced from HCS |
+| SOC 2 Type II audit | Enterprise sales requirement |
+| Multi-agent chain of custody | Log handoffs between AI agents with full attribution |
 
 ### Design Decisions
 
 | Decision | Options | Choice | Rationale |
 |----------|---------|--------|-----------|
-| SDK | `@hiero-ledger/sdk` vs `@hashgraph/sdk` | `@hashgraph/sdk` | Better maintained, wider community, same API surface |
-| Dashboard | Streamlit vs vanilla HTML | `index.html` with fetch | Zero dependencies, runs anywhere, judges can open file:// |
-| Mirror node reads | SDK subscription vs REST polling | REST polling | No persistent connection needed; simpler for demo; 3s interval is fine |
-| Message format | Raw string vs JSON | JSON | Structured data enables dashboard rendering and future parsing |
-| Case data | Real vs synthetic | Synthetic Universal Credit | Eliminates GDPR risk, still demonstrates real workflow |
-
-### Post-Hackathon Roadmap
-- **Month 1–2:** Productise as SDK middleware — `apexAudit.wrap(agent)` intercepts any agent call automatically
-- **Month 3–6:** EU AI Act compliance report generator (PDF export from HCS trail), first paying beta customers
-- **Month 6–12:** Multi-topic support (per-agent, per-client), SOC 2 audit, enterprise sales to legal AI platforms
+| Transport | HTTP server vs MCP | Both | Dashboard for human UX; MCP for agent-to-agent integration |
+| LLM coupling | Anthropic-only vs MCP-native | MCP-native | Any LLM can call tools; Claude is the default implementation only |
+| Case routing | Single queue vs priority split | Urgent/Standard split | Maps to real legal workflow; Urgent auto-processes, Standard awaits review |
+| File hashing | Server-side vs browser | Browser (SubtleCrypto) | File content never leaves client; only hash goes to server and HCS |
+| SDK | `@hiero-ledger/sdk` vs `@hashgraph/sdk` | `@hashgraph/sdk` | Largest install base; identical API surface |
 
 ---
 
 ## 8. Validation Strategy
 
-### Feedback Sources
-- **During hackathon:** Judges' reactions to the live HashScan verification moment — does it land? Adjust pitch accordingly.
-- **Week 1 post-hackathon:** Post in LegalTech Slack communities (Legal Hackers, LawTech UK), ask: "Would you pay $0.10/case for this?"
-- **Month 1:** Outreach to 5 EU-based legal AI vendors currently scrambling for AI Act compliance tooling.
+### Current Traction
 
-### Validation Milestones
+- MVP is **fully functional and deployed** to GitHub
+- End-to-end flow verified: file upload → Claude analysis → HCS log → attestation → HashScan verification
+- MCP server tested with Claude Desktop via `.mcp.json` config
+
+### Validation Plan
 
 | Milestone | Target | Timeline |
 |-----------|--------|----------|
-| Judges verify on HashScan live | 3/5 judges click the link | Demo day |
-| Positive responses from LegalTech community | 10 upvotes / replies | Week 1 |
-| Discovery calls booked | 3 calls | Month 1 |
-| Letter of intent / paid trial | 1 customer | Month 2 |
+| Judges verify live on HashScan | 3/5 judges click the link | Demo day |
+| Judges call out MCP as differentiator | Unprompted mention in Q&A | Demo day |
+| LegalTech community engagement | 10+ upvotes / responses on Show HN or Legal Hackers Slack | Week 1 |
+| Discovery calls booked | 3 calls with legal AI vendors | Month 1 |
+| Letter of intent | 1 customer LOI | Month 2 |
+| Paid trial | 1 paying customer | Month 3 |
+| MCP tool registry listing | APEX AUDIT listed as verified MCP server | Month 1 |
 
 ### Market Feedback Cycles
-1. **Cycle 1:** Post demo video to LegalTech communities; measure engagement and collect "would you use this?" responses
-2. **Cycle 2:** 5 discovery calls with legal AI vendors; validate willingness to pay and pricing model
+
+1. **Cycle 1 (Demo day):** Pitch the EU AI Act deadline + live HashScan moment. Measure: do judges understand the compliance value immediately? Does the MCP angle land?
+2. **Cycle 2 (Week 1):** Post to Legal Hackers Slack, LawTech UK, Hacker News. Ask: "Would you pay $0.10/case for an independently verifiable AI audit trail?" Measure: sentiment, price sensitivity, use-case variety in responses.
+3. **Cycle 3 (Month 1):** 5 discovery calls with EU legal AI vendors. Validate: integration path, pricing model, procurement timeline, who owns the compliance budget.
 
 ---
 
 ## 9. Go-To-Market Strategy
 
 ### Target Market
-- **TAM:** €2.1B — all organisations subject to EU AI Act AI system audit requirements
-- **SAM:** €420M — legal AI platform vendors and law firms in the EU needing automated compliance tooling
-- **Initial Target:** 50 EU-based legal AI SaaS vendors deploying AI to process legal cases before August 2026
 
-### Distribution Channels
-1. **Direct developer outreach** — GitHub, LegalTech Slack, Hacker News "Show HN" — reach teams building the AI systems that need auditing
-2. **EU AI Act compliance consultants** — they advise law firms; position APEX AUDIT as the recommended technical solution
+| Market | Size | Notes |
+|--------|------|-------|
+| **TAM** | €2.1B | All organisations subject to EU AI Act AI system audit requirements |
+| **SAM** | €420M | Legal AI platform vendors + law firms in EU needing automated compliance tooling |
+| **SOM (Year 1)** | €5M | 50 EU-based legal AI SaaS vendors + 10 enterprise deployments |
 
-### Growth Strategy
-- Regulatory deadline (August 2026) creates a forcing function — every legal AI platform needs this
-- Network effect: every firm that publishes a HashScan topic ID normalises the standard, creating demand from regulators to see it from others
+### Distribution
+
+1. **MCP tool registry** — list APEX AUDIT as a verified MCP server; any developer building with MCP discovers it organically
+2. **Direct developer outreach** — GitHub, LegalTech Slack, "Show HN" — reach teams building the AI systems that need auditing
+3. **EU AI Act compliance consultants** — they advise dozens of firms each; a single partnership multiplies reach
+4. **Conference presence** — ILTACON, Legal Geek, EU AI Act compliance summits (Q3–Q4 2026)
+
+### Competitive Moat
+
+```
+MCP-native (LLM-agnostic) × Hedera economics ($0.0001/message) × Regulatory deadline (Aug 2026)
+= Infrastructure position before any competitor ships
+```
+
+No competitor can reach this position without:
+- Rebuilding their product as an MCP server (6+ months)
+- Migrating to Hedera from whatever chain they started on
+- Racing against a regulatory deadline that creates captive demand right now
 
 ---
 
 ## 10. Pitch Outline
 
-1. **The Problem (30s):** "In August 2026, the EU AI Act makes AI audit trails mandatory for legal services. Penalties are €35 million. Right now, no compliant infrastructure exists. We built it."
+### The Pitch (3 minutes)
 
-2. **The Solution (60s):** "APEX AUDIT intercepts AI agent decisions at three points and writes them permanently to Hedera HCS. Input hash. Reasoning summary. Human attestation. Each message is immutably timestamped by network consensus — not by us." *(run demo)*
+**1. The Problem (30s)**
+> "In August 2026, the EU AI Act makes AI audit trails mandatory for high-risk decisions — legal, financial, medical, benefits. Penalties are €35 million. Right now, no infrastructure exists that a court can independently verify. We built it."
 
-3. **Hedera Integration (45s):** "We chose Hedera because it's the only network where this is economically viable. €0.0001 per audit message. 3-second finality. And — uniquely — HashScan gives a third party an independent verification URL. A court doesn't need to trust us. They just need this link." *(click HashScan link)*
+**2. The Demo (60s)**
+> "Watch this." *(Upload a case. Show Claude analysing. Show the HCS checkpoint timeline appearing in real time. Click HashScan link.)*
+> "That's a permanently recorded, court-verifiable AI decision trail. SHA-256 hash of the input. Claude's reasoning. Human attestation. All on Hedera HCS — not on our servers. Anyone can verify this with just a topic ID."
 
-4. **Traction (30s):** "The EU AI Act creates a forcing function. Legal AI is a €2.1B compliance market being created by regulation. We've already had conversations with [X] — they asked us 'when can we integrate this?'"
+**3. The MCP Differentiator (30s)**
+> "Here's what makes this infrastructure, not a point solution. We implemented the Model Context Protocol. That means this isn't just for Claude. GPT-4o, Gemini, Llama, any MCP-compatible AI — they all call `apex_log_case` and get the same Hedera-verified audit trail. We're not in the LLM business. We're the compliance layer underneath all of them."
 
-5. **The Opportunity (30s):** "$0.10 per case audited. A mid-size legal AI platform processes 10,000 cases a month — that's $1,000/month from a single customer. 50 customers = $50,000 MRR."
+**4. The Business (30s)**
+> "$0.10 per case audited. A mid-size legal AI platform processes 10,000 cases a month — $1,000/month per customer. Our Phase 2 roadmap adds HBAR micropayments — AI agents pay per audit autonomously, via HashPack wallet integration and Chainlink price feeds for EUR-settled billing. Zero human payment friction."
 
-6. **The Ask (15s):** "We're raising a pre-seed to productise the SDK and land our first 5 enterprise customers before the August 2026 deadline."
+**5. The Opportunity (15s)**
+> "€2.1 billion compliance market. August 2026 enforcement. First-mover on Hedera. We're raising pre-seed to land 5 enterprise customers before the deadline."
 
-### Key Metrics to Present
-- €35M penalty exposure (EU AI Act) — [Source: EU AI Act Article 99]
-- €0.0001 per HCS message — [Source: Hedera fee schedule]
-- 3–5 second HCS finality — [Source: Hedera documentation]
-- €2.1B compliance TAM — [Source: EU AI Act economic impact assessments]
+### Key Numbers to Present
+
+| Metric | Value | Source |
+|--------|-------|--------|
+| EU AI Act penalty | €35M or 7% global revenue | EU AI Act Art. 99 |
+| HCS message cost | ~$0.0001 | Hedera fee schedule |
+| HCS finality | 3–5 seconds | Hedera documentation |
+| Compliance market TAM | €2.1B (2026–2030) | EU AI Act economic impact assessments |
+| Ethereum equivalent cost | ~$0.50–$5.00 per log | Etherscan gas tracker |
 
 ---
 
-## Parking Lot (Post-Hackathon)
+## 11. Non-Goals (Current Version)
 
-- HTS attestation token: mint a non-fungible "compliance certificate" for each completed audit trail
-- Scheduled Transactions: auto-escalate un-attested recommendations after 24 hours
-- Multi-agent: log cross-agent handoffs (agent A → agent B) with full chain of custody
-- IPFS/HFS: store full case documents (hashed) alongside HCS references
-- Webhook integration: `POST /audit/wrap` endpoint so any existing legal AI platform can integrate in minutes
+- No real case data — synthetic demo only (eliminates GDPR risk for demo)
+- No production authentication or access control
+- No persistent storage (in-memory pendingCases — stateless restart)
+- No multi-tenant isolation between customers
+- No HBAR payments (Phase 2)
+- No HTS token minting (Phase 2)
+- No smart contracts (Phase 3)
 
 ---
 
@@ -275,27 +462,54 @@ A centralised audit log answers the question "what does APEX AUDIT's database sa
 
 | Section | Predicted Score | Rationale | How to Improve |
 |---------|----------------|-----------|----------------|
-| Innovation (10%) | **4/5** | First AI Act compliance audit trail on Hedera; novel reframing of HCS as legal evidence ledger | Add HTS attestation token to claim "previously unseen cross-service usage" |
-| Feasibility (10%) | **4/5** | HCS-only stack is maximally simple; regulatory forcing function is strong business model signal | Present Lean Canvas verbally during pitch; name a specific potential customer |
-| Execution (20%) | **4/5** | Full working demo with live on-chain verification is strong; single developer is a risk | Ensure dashboard loads cleanly with no errors; add a 60s "happy path" demo script |
-| Integration (15%) | **3/5** | Deep HCS usage but only one Hedera service | Adding HashScan as the verification UX is clever but not a Hedera *service* — consider minting an HTS attestation token |
-| Validation (15%) | **2/5** | Regulatory deadline is compelling but no external user feedback yet | During hackathon: get 2–3 people outside your team to watch the demo and quote them |
-| Success (20%) | **3/5** | Clear account creation and TPS story; niche vertical limits near-term scale | Quantify the "0.1% of Universal Credit = 1,200 HCS messages/day" number in the pitch |
-| Pitch (10%) | **5/5** | Regulatory hook, live on-chain verification, clear revenue model — extremely pitchable | Rehearse the HashScan moment so it lands cleanly |
+| **Innovation (10%)** | **5/5** | MCP-native + Hedera = genuinely novel in any ecosystem; reframing HCS as legal evidence ledger; first AI governance infrastructure on Hedera | This is already a 5 — demonstrate it clearly in the pitch |
+| **Feasibility (10%)** | **4/5** | Fully working MVP; regulatory forcing function is real; team demonstrated delivery; no dependency on anything not built | Name a specific potential customer in the pitch; "we've had a conversation with [X]" |
+| **Execution (20%)** | **4/5** | End-to-end working demo; polished dashboard with dark mode, case management, file upload; urgent/standard routing shows product thinking | Fix the in-memory persistence before demo (add a JSON file store); ensure zero console errors on live demo |
+| **Integration (15%)** | **4/5** | Deep HCS usage; MCP bridge is novel; HashScan verification UX is strong | Add one HTS `TokenMintTransaction` for the AUDIT_CERT NFT — lifts to 5/5 by showing multi-service usage |
+| **Validation (15%)** | **3/5** | Regulatory deadline is strong structural validation; no external user feedback yet | Get 2–3 people outside the team to watch the demo and quote them: "a solicitor at X said..." |
+| **Success (20%)** | **4/5** | Clear account creation story; Phase 2 HBAR + SaucerSwap path shows Hedera network growth; MCP means any LLM ecosystem drives Hedera transactions | Quantify the Phase 2 agentic commerce TPS in the pitch; "every GPT-4o audit call = 3 Hedera transactions" |
+| **Pitch (10%)** | **5/5** | Regulatory hook is undeniable; live HashScan moment is the killer demo; MCP differentiator is clear and defensible; Phase 2 roadmap is credible | Rehearse so the HashScan click happens in under 5 seconds |
 
-**Projected weighted score: ~73/100**
+**Projected weighted score: ~81/100**
 
-### Highest-Impact Improvement
-Add a single HTS `TokenMintTransaction` at the end of the flow to mint an "AUDIT_COMPLETE" NFT. This lifts Integration from 3→4 and potentially unlocks the "creative cross-service usage" 5 — worth +3 weighted points.
+### Highest-Impact Actions Before Demo Day
+
+1. **Add HTS AUDIT_CERT NFT mint** (2 hours) — lifts Integration from 4→5 (+1.5 weighted points)
+2. **Add a JSON file store for pendingCases** (1 hour) — removes the obvious "what happens on restart" question from judges
+3. **Get one external quote** — send the demo to one lawyer or compliance officer and quote their reaction verbatim in the pitch (+Validation)
+4. **Rehearse the HashScan moment** — open HashScan on a second screen, have the topic ID ready, click the link live without fumbling
 
 ---
 
-## SDK Note
-
-The project uses `@hashgraph/sdk` (not `@hiero-ledger/sdk`). These share the same API surface — `@hashgraph/sdk` is the original package with the largest install base. Run:
+## Appendix: SDK and Environment Reference
 
 ```bash
-npm install @hashgraph/sdk
+npm install                        # Install all dependencies
+node scripts/setup.js              # One-time: create HCS topic, write HEDERA_TOPIC_ID to .env
+node scripts/createTopics.js       # (Alternative) Create named topics
+node src/mcp-server.js             # Run MCP server (stdio transport)
+node server.js                     # Run dashboard server (http://localhost:3000)
+node scripts/runDemo.js            # Run full demo audit flow
+npm test                           # Run test suite
 ```
 
-All `TopicCreateTransaction`, `TopicMessageSubmitTransaction` imports are identical between the two packages.
+**Required environment variables** (see `.env.example`):
+```
+HEDERA_ACCOUNT_ID=0.0.XXXXX
+HEDERA_PRIVATE_KEY=<DER or hex encoded ECDSA key>
+HEDERA_TOPIC_ID=0.0.XXXXX
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+**MCP client config** (`.mcp.json` in project root — already configured):
+```json
+{
+  "mcpServers": {
+    "apex-audit": {
+      "command": "node",
+      "args": ["/absolute/path/to/apex/src/mcp-server.js"],
+      "env": { "HEDERA_ACCOUNT_ID": "...", "HEDERA_PRIVATE_KEY": "...", "HEDERA_TOPIC_ID": "...", "ANTHROPIC_API_KEY": "..." }
+    }
+  }
+}
+```
