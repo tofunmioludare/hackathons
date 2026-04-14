@@ -1,4 +1,9 @@
 /**
+ * Copyright (c) 2026 Tofunmi Oludare and Patrick Belinga. All rights reserved.
+ * Proprietary and confidential. Unauthorised copying, distribution, or use is prohibited.
+ */
+
+/**
  * Generates public/sample-case.pdf — a realistic legal case document
  * for APEX AUDIT upload testing. No external dependencies required.
  */

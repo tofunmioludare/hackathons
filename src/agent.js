@@ -1,4 +1,9 @@
 /**
+ * Copyright (c) 2026 Tofunmi Oludare and Patrick Belinga. All rights reserved.
+ * Proprietary and confidential. Unauthorised copying, distribution, or use is prohibited.
+ */
+
+/**
  * APEX AUDIT — AI Caseworker Agent
  *
  * Runs a single case through the full audit lifecycle:

@@ -1,4 +1,9 @@
 /**
+ * Copyright (c) 2026 Tofunmi Oludare and Patrick Belinga. All rights reserved.
+ * Proprietary and confidential. Unauthorised copying, distribution, or use is prohibited.
+ */
+
+/**
  * APEX AUDIT — One-time setup
  * Creates the HCS audit trail topic on Hedera testnet.
  * Writes HEDERA_TOPIC_ID back to .env automatically.

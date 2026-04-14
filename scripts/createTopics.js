@@ -1,4 +1,9 @@
 /**
+ * Copyright (c) 2026 Tofunmi Oludare and Patrick Belinga. All rights reserved.
+ * Proprietary and confidential. Unauthorised copying, distribution, or use is prohibited.
+ */
+
+/**
  * One-time setup: create the three HCS topics APEX needs.
  * Run once: node scripts/createTopics.js
  * Copy the output IDs into your .env file.

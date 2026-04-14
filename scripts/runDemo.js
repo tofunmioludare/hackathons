@@ -1,4 +1,9 @@
 /**
+ * Copyright (c) 2026 Tofunmi Oludare and Patrick Belinga. All rights reserved.
+ * Proprietary and confidential. Unauthorised copying, distribution, or use is prohibited.
+ */
+
+/**
  * APEX AUDIT — Demo runner
  *
  * Runs a full 3-checkpoint audit trail (CASE_RECEIVED → AGENT_RECOMMENDATION
